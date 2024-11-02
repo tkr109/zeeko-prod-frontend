@@ -1,3 +1,5 @@
+// lib/inital/GroupDetailsPage.dart
+
 import 'package:flutter/material.dart';
 
 class GroupDetailsPage extends StatelessWidget {

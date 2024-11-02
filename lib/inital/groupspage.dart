@@ -20,13 +20,10 @@ class _GroupsPageState extends State<GroupsPage> {
     _fetchUserJoinedGroups();
   }
 
-  // Function to fetch the joined groups of the user using the user ID
   Future<void> _fetchUserJoinedGroups() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId =
-        prefs.getString('userId'); // Retrieve user ID from SharedPreferences
-    String? token =
-        prefs.getString('token'); // Retrieve token for authentication
+    String? userId = prefs.getString('userId');
+    String? token = prefs.getString('token');
 
     if (userId == null || token == null) {
       showSnackbar(context, "User ID or token not found. Please log in again.",
@@ -40,7 +37,7 @@ class _GroupsPageState extends State<GroupsPage> {
       final response = await http.get(
         url,
         headers: {
-          'Authorization': 'Bearer $token', // Send token for authentication
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -63,13 +60,11 @@ class _GroupsPageState extends State<GroupsPage> {
   Future<void> sendPendingRequest(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Retrieve email, name, and token from shared preferences
     String? email = prefs.getString('email');
     String? fullName = prefs.getString('fullName');
     String? token = prefs.getString('token');
     String groupCode = codeController.text;
 
-    // Check if all necessary data is present
     if (email == null ||
         fullName == null ||
         token == null ||
@@ -91,7 +86,7 @@ class _GroupsPageState extends State<GroupsPage> {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Send token in headers
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
           'groupCode': groupCode,
@@ -148,7 +143,7 @@ class _GroupsPageState extends State<GroupsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 20), // Add 20px gap from AppBar
+                    SizedBox(height: 20),
                     Text(
                       "Groups Joined",
                       style:
@@ -161,8 +156,8 @@ class _GroupsPageState extends State<GroupsPage> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: GestureDetector(
                             onTap: () {
-                              context.go(
-                                  '/home/group-details/${group['id']}'); // Navigate to dynamic route
+                              context.push(
+                                  '/home/groups/group-details/${group['id']}'); // Use context.push to keep navigation stack
                             },
                             child: GroupCircle(title: group['name']),
                           ),
@@ -193,8 +188,7 @@ class _GroupsPageState extends State<GroupsPage> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(
-                              6), // Limit to 6 digits
+                          LengthLimitingTextInputFormatter(6),
                         ],
                         decoration: InputDecoration(
                           labelText: "Enter 6-digit group code",

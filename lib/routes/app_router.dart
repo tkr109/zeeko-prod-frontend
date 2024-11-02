@@ -1,6 +1,11 @@
+// lib/routes/app_router.dart
+
 import 'package:flutter/material.dart';
-import 'package:frontend/inital/GroupDetailsPage.dart';
 import 'package:frontend/inital/main_layout.dart';
+import 'package:frontend/inital/GroupDetailsPage.dart';
+import 'package:frontend/inital/groupspage.dart';
+import 'package:frontend/inital/homepage.dart';
+import 'package:frontend/inital/messagespage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../onboarding/options_screen.dart';
@@ -17,17 +22,40 @@ class AppRouter {
         path: '/options',
         builder: (context, state) => OptionsScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => MainLayout(),
+      ShellRoute(
+        builder: (context, state, child) => MainLayout(child: child),
         routes: [
-          // Nested route for Group Details page
           GoRoute(
-            path: 'group-details/:groupId',
-            builder: (context, state) {
-              final groupId = state.pathParameters['groupId']!;
-              return GroupDetailsPage(groupId: groupId);
-            },
+            path: '/home',
+            name: 'home',
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: HomePage(),
+            ),
+          ),
+          GoRoute(
+            path: '/home/groups',
+            name: 'groups',
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: GroupsPage(),
+            ),
+            routes: [
+              GoRoute(
+                path: 'group-details/:groupId',
+                pageBuilder: (context, state) {
+                  final groupId = state.pathParameters['groupId']!;
+                  return NoTransitionPage(
+                    child: GroupDetailsPage(groupId: groupId),
+                  );
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/home/messages',
+            name: 'messages',
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: MessagesPage(),
+            ),
           ),
         ],
       ),
@@ -43,7 +71,7 @@ class AuthCheckScreen extends StatelessWidget {
     if (token == null || token.isEmpty) {
       context.go('/options'); // Navigate to options screen if not authenticated
     } else {
-      context.go('/home'); // Navigate to homepage if authenticated
+      context.goNamed('groups'); // Navigate to Groups page if authenticated
     }
   }
 
