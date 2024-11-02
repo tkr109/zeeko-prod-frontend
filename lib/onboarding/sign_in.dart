@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/homepage.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/widgets/get_started.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:go_router/go_router.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -51,31 +53,22 @@ class _SignInScreenState extends State<SignInScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final token = data['token']; // Extract JWT token from response
+        final token = data['token'];
         print('OTP verified successfully. Token: $token');
-        print(emailController.text);
         await saveUserState(data['token'], emailController.text);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
-        // Handle successful verification (e.g., navigate to a new screen, store the token)
+
+        // Navigate to HomePage using GoRouter
+
+        context.go('/home');
       } else {
         print('Invalid OTP or request failed. Message: ${response.body}');
-        // Handle error (e.g., show an error message)
       }
     } catch (e) {
       print('Error occurred: $e');
-      // Handle network or server error
     }
   }
 
   void loginUser() async {
-    print("--------------------------------------");
-    print("email: ${emailController.text}");
-    print("password: ${passwordController.text}");
-    print("--------------------------------------");
-
     var response = await http.post(
       Uri.parse('http://192.168.100.12:5000/api/auth/signin'),
       headers: {'Content-Type': 'application/json'},
@@ -86,15 +79,16 @@ class _SignInScreenState extends State<SignInScreen> {
     );
 
     if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
-      print('-------------');
-      print(jsonResponse);
-      print('-------------');
-    } else if (response.statusCode == 400) {
-      var jsonResponse = json.decode(response.body);
-      print('-------------');
-      print(jsonResponse);
-      print('-------------');
+      print('Login successful');
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      setState(() {
+        _currentStep++;
+      });
+    } else {
+      print('Login failed');
     }
   }
 
@@ -136,7 +130,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   );
                 });
               } else {
-                Navigator.pop(context);
+                context.pop();
               }
             },
           ),
@@ -152,15 +146,13 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
             ),
           ),
-          centerTitle: false,
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: Text(
                 "${_currentStep + 1}/2",
                 style: TextStyle(
-                  color: Colors
-                      .grey.shade600, // Muted grey color for less visibility
+                  color: Colors.grey.shade600,
                   fontSize: 16,
                 ),
               ),
@@ -170,7 +162,6 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
       body: Column(
         children: [
-          // Progress Indicator
           Padding(
             padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
             child: LinearProgressIndicator(
@@ -190,14 +181,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 });
               },
               children: [
-                // Step 1: Sign In
                 buildSignInForm(),
-                // Step 2: OTP Verification
                 buildOtpVerification(),
               ],
             ),
           ),
-          // Continue Button
           GetStartedButton(
             buttonText: "Continue",
             onPressed: () {
@@ -206,19 +194,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   (_currentStep == 1 && isOtpComplete)) {
                 if (_currentStep < 1) {
                   loginUser();
-                  _pageController.nextPage(
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                  setState(() {
-                    _currentStep++;
-                  });
                 } else {
                   verifyOtp(emailController.text, getOtp());
                   print("Onboarding Complete");
                 }
               } else {
-                // Show SnackBar if fields are incomplete
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     backgroundColor: Colors.grey.shade900,
@@ -226,10 +206,6 @@ class _SignInScreenState extends State<SignInScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    margin:
-                        EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
                     content: Row(
                       children: [
                         Icon(Icons.error_outline,
@@ -249,7 +225,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ],
                     ),
-                    duration: Duration(seconds: 3),
                   ),
                 );
               }
@@ -261,7 +236,6 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  // Helper method to build Sign In Form
   Widget buildSignInForm() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -270,13 +244,8 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Sign In",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text("Sign In",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             SizedBox(height: 20),
             buildTextField("Email", emailController, TextInputType.emailAddress,
                 validator: validateEmail),
@@ -289,31 +258,18 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  // Helper method to build OTP Verification
   Widget buildOtpVerification() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Enter the OTP sent to",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
+          Text("Enter the OTP sent to",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           SizedBox(height: 8),
-          Text(
-            emailController.text, // Displays the entered email
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
-            ),
-          ),
+          Text(emailController.text,
+              style: TextStyle(fontSize: 16, color: Colors.black54)),
           SizedBox(height: 20),
-          // OTP Input Fields with auto-focus
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(4, (index) {
@@ -343,80 +299,51 @@ class _SignInScreenState extends State<SignInScreen> {
                           .requestFocus(otpFocusNodes[index - 1]);
                     }
                   },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
                 ),
               );
             }),
-          ),
-          SizedBox(height: 20),
-          Center(
-            child: TextButton(
-              onPressed: () {
-                // Handle OTP resend action here
-                print("Request another OTP");
-              },
-              child: Text(
-                "Request another OTP",
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
           ),
         ],
       ),
     );
   }
 
-  // Helper method to build text fields with validation
-  Widget buildTextField(
-    String label,
-    TextEditingController controller,
-    TextInputType inputType, {
-    bool obscureText = false,
-    String? Function(String?)? validator,
-  }) {
+  Widget buildTextField(String label, TextEditingController controller,
+      TextInputType keyboardType,
+      {bool obscureText = false, String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15.0),
       child: TextFormField(
         controller: controller,
-        keyboardType: inputType,
+        keyboardType: keyboardType,
         obscureText: obscureText,
+        validator: validator,
         decoration: InputDecoration(
           labelText: label,
+          filled: true,
+          fillColor: Colors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
-          filled: true,
-          fillColor: Colors.white,
         ),
-        validator: validator,
       ),
     );
   }
 
-  // Validation functions
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email';
+      return "Please enter your email.";
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email';
+    if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$")
+        .hasMatch(value)) {
+      return "Please enter a valid email.";
     }
     return null;
   }
 
   String? validateNotEmpty(String? value) {
     if (value == null || value.isEmpty) {
-      return 'This field cannot be empty';
+      return "This field cannot be empty.";
     }
     return null;
   }

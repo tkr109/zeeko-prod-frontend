@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/onboarding/welcome_screen.dart';
-// import 'package:frontend/screens/welcome_screen.dart'; // Import the WelcomeScreen
+import 'routes/app_router.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,9 +8,9 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Zeeko',
-      home: WelcomeScreen(), // Set WelcomeScreen as the home screen
+      routerConfig: AppRouter.router,
     );
   }
 }
