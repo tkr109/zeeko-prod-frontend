@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
+import 'package:frontend/groupInfo/Display/DisplayGroupEvent.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -158,17 +159,6 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       },
                     ),
                     _buildDrawerItem(
-                      icon: Icons.payment,
-                      text: "Payments",
-                      onTap: () {
-                        setModalState(() {
-                          showingSubgroups = true;
-                          selectedCategory = "Payments";
-                        });
-                        fetchAndDisplaySubgroups(setModalState);
-                      },
-                    ),
-                    _buildDrawerItem(
                       icon: Icons.poll,
                       text: "Polls",
                       onTap: () {
@@ -187,15 +177,16 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                         icon: Icons.group,
                         text: subgroup['name'],
                         onTap: () {
-                          // Navigate with subgroup ID and category
                           Navigator.pop(context); // Close the drawer
                           if (selectedCategory == "Posts") {
                             context.push(
                                 '/home/groups/group-details/${widget.groupId}/add-post/${subgroup['id']}');
-                          } else {
-                            // Handle other category selections if needed
+                          } else if (selectedCategory == "Polls") {
                             context.push(
-                                '/home/groups/group-details/${widget.groupId}/${selectedCategory.toLowerCase()}/${subgroup['id']}');
+                                '/home/groups/group-details/${widget.groupId}/add-poll/${subgroup['id']}');
+                          } else if (selectedCategory == "Events") {
+                            context.push(
+                                '/home/groups/group-details/${widget.groupId}/add-event/${subgroup['id']}');
                           }
                         },
                       ),
@@ -231,9 +222,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
   Widget _getSectionContent() {
     switch (_selectedSection) {
       case 0:
-        return Center(
-            child: Text('No Events have been scheduled yet',
-                style: TextStyle(fontSize: 16, color: Colors.grey)));
+        return DisplayGroupEvent();
       case 1:
         return Center(
             child: Text('No Posts available',

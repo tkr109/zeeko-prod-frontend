@@ -1,6 +1,9 @@
 // lib/routes/app_router.dart
 
 import 'package:flutter/material.dart';
+import 'package:frontend/groupInfo/Add/AddEventPage.dart';
+import 'package:frontend/groupInfo/Add/AddPollPage.dart';
+import 'package:frontend/groupInfo/Add/AddPostPage.dart';
 import 'package:frontend/groupInfo/SubgroupsPage.dart';
 import 'package:frontend/inital/main_layout.dart';
 import 'package:frontend/groupInfo/GroupDetailsPage.dart';
@@ -8,7 +11,6 @@ import 'package:frontend/groupInfo/MembershipPage.dart';
 import 'package:frontend/inital/groupspage.dart';
 import 'package:frontend/inital/homepage.dart';
 import 'package:frontend/inital/messagespage.dart';
-import 'package:frontend/groupInfo/AddPostPage.dart'; // Import AddPostPage here
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../onboarding/options_screen.dart';
@@ -70,6 +72,24 @@ class AppRouter {
                       final groupId = state.pathParameters['groupId']!;
                       final subgroupId = state.pathParameters['subgroupId']!;
                       return AddPostPage(
+                          groupId: groupId, subgroupId: subgroupId);
+                    },
+                  ),
+                  GoRoute(
+                    path: 'add-poll/:subgroupId', // Route for AddPollPage
+                    builder: (context, state) {
+                      final groupId = state.pathParameters['groupId']!;
+                      final subgroupId = state.pathParameters['subgroupId']!;
+                      return AddPollPage(
+                          groupId: groupId, subgroupId: subgroupId);
+                    },
+                  ),
+                  GoRoute(
+                    path: 'add-event/:subgroupId',
+                    builder: (context, state) {
+                      final groupId = state.pathParameters['groupId']!;
+                      final subgroupId = state.pathParameters['subgroupId']!;
+                      return AddEventPage(
                           groupId: groupId, subgroupId: subgroupId);
                     },
                   ),
