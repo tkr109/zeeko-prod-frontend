@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants.dart';
 import 'package:frontend/homepage.dart';
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/widgets/get_started.dart';
@@ -37,7 +38,7 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> verifyOtp(String email, String otp) async {
-    final url = Uri.parse("http://192.168.100.12:5000/api/auth/verify-otp");
+    final url = Uri.parse('${Constants.serverUrl}/api/auth/verify-otp');
 
     try {
       final response = await http.post(
@@ -70,7 +71,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void loginUser() async {
     var response = await http.post(
-      Uri.parse('http://192.168.100.12:5000/api/auth/signin'),
+      Uri.parse('${Constants.serverUrl}/api/auth/signin'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'email': emailController.text,

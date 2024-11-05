@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -32,8 +33,7 @@ class _GroupsPageState extends State<GroupsPage> {
     }
 
     try {
-      final url =
-          Uri.parse('http://192.168.100.12:5000/api/user/groups/$userId');
+      final url = Uri.parse('${Constants.serverUrl}/api/user/groups/$userId');
       final response = await http.get(
         url,
         headers: {
@@ -81,7 +81,7 @@ class _GroupsPageState extends State<GroupsPage> {
 
     try {
       final url =
-          Uri.parse('http://192.168.100.12:5000/api/group/addPendingRequest');
+          Uri.parse('${Constants.serverUrl}/api/group/addPendingRequest');
       final response = await http.post(
         url,
         headers: {

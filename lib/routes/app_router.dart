@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:frontend/inital/main_layout.dart';
-import 'package:frontend/inital/GroupDetailsPage.dart';
+import 'package:frontend/groupInfo/GroupDetailsPage.dart';
+import 'package:frontend/groupInfo/MembershipPage.dart';
 import 'package:frontend/inital/groupspage.dart';
 import 'package:frontend/inital/homepage.dart';
 import 'package:frontend/inital/messagespage.dart';
@@ -41,13 +42,20 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: 'group-details/:groupId',
-                pageBuilder: (context, state) {
+                builder: (context, state) {
                   final groupId = state.pathParameters['groupId']!;
-                  return NoTransitionPage(
-                    child: GroupDetailsPage(groupId: groupId),
-                  );
+                  return GroupDetailsPage(groupId: groupId);
                 },
-              ),
+                routes: [
+                  GoRoute(
+                    path: 'membership',
+                    builder: (context, state) {
+                      final groupId = state.pathParameters['groupId']!;
+                      return MembershipPage(groupId: groupId);
+                    },
+                  ),
+                ],
+              )
             ],
           ),
           GoRoute(
