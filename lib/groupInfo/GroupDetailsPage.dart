@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
 import 'package:frontend/groupInfo/Display/DisplayGroupEvent.dart';
+import 'package:frontend/groupInfo/Display/DisplayGroupPosts.dart';
+import 'package:frontend/groupInfo/Display/DisplayPollsPage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,11 +25,13 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
   bool _isAdmin = false;
   List<Map<String, dynamic>> _subgroups = []; // Store fetched subgroups
   bool _subgroupsLoading = false; // Loading state for subgroups
-
+  String? selectedSubgroupId; // Store selected subgroup ID
+  String? userSubgroup;
   @override
   void initState() {
     super.initState();
     _fetchGroupDetails();
+    _getUserSubgroup();
   }
 
   Future<void> _fetchGroupDetails() async {
@@ -103,6 +107,36 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
         _subgroupsLoading = false;
       });
       _showSnackBar('Error loading subgroups');
+    }
+  }
+
+  Future<void> _getUserSubgroup() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    String? userId = prefs.getString('userId');
+    final url = Uri.parse(
+        '${Constants.serverUrl}/api/group/userSubgroups/${widget.groupId}/${userId}');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      print(response.body);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          userSubgroup = data['subgroup']['subgroupId'];
+          print(userSubgroup); // Store the subgroup ID
+        });
+      } else {
+        _showSnackBar('Failed to load user subgroup');
+      }
+    } catch (e) {
+      _showSnackBar('Error loading user subgroup');
     }
   }
 
@@ -222,19 +256,38 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
   Widget _getSectionContent() {
     switch (_selectedSection) {
       case 0:
-        return DisplayGroupEvent();
+        if (userSubgroup != null) {
+          return DisplayGroupEvent(
+            groupId: widget.groupId,
+            subgroupId: userSubgroup!,
+          );
+        } else {
+          return Center(child: Text('Please select a subgroup for Events'));
+        }
       case 1:
-        return Center(
-            child: Text('No Posts available',
-                style: TextStyle(fontSize: 16, color: Colors.grey)));
+        if (userSubgroup != null && widget.groupId.isNotEmpty) {
+          return DisplayGroupPosts(
+            groupId: widget.groupId,
+            subgroupId: userSubgroup!,
+          );
+        } else {
+          return Center(
+              child: Text('Please select a valid subgroup for Events'));
+        }
       case 2:
         return Center(
             child: Text('Payments Section',
                 style: TextStyle(fontSize: 16, color: Colors.grey)));
       case 3:
-        return Center(
-            child: Text('Polls Section',
-                style: TextStyle(fontSize: 16, color: Colors.grey)));
+        if (userSubgroup != null && widget.groupId.isNotEmpty) {
+          return DisplayPollsPage(
+            groupId: widget.groupId,
+            subgroupId: userSubgroup!,
+          );
+        } else {
+          return Center(
+              child: Text('Please select a valid subgroup for Events'));
+        }
       default:
         return Container();
     }

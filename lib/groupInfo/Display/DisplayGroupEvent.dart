@@ -30,11 +30,11 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
   Future<void> fetchEvents() async {
     try {
       final response = await http.get(Uri.parse(
-          '${Constants.serverUrl}/api/groups/events/${widget.groupId}/${widget.subgroupId}'));
+          '${Constants.serverUrl}/api/group/events/${widget.groupId}/${widget.subgroupId}'));
 
       if (response.statusCode == 200) {
         final List<dynamic> eventList = json.decode(response.body)['events'];
-
+        print(response.body);
         setState(() {
           events = eventList
               .map((e) => {
@@ -42,7 +42,13 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
                     "date": formatDate(e['timings']),
                     "location": e['location'],
                     "imageUrl":
-                        e['bannerImage'] ?? 'https://via.placeholder.com/150'
+                        e['bannerImage'] ?? 'https://via.placeholder.com/150',
+                    "responses": e['responses'],
+                    "duration": e['duration'],
+                    "description": e['description'],
+                    "isAcceptingResponses": e['isAcceptingResponses'],
+                    "isVisible": e['isVisible'],
+                    "comments": e['comments'] ?? []
                   })
               .toList();
           isLoading = false;
@@ -106,7 +112,9 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
                           date: event['date'],
                           location: event['location'],
                           imageUrl: event['imageUrl'],
-                          onTap: () {},
+                          onTap: () {
+                            // Optionally handle card tap
+                          },
                         )),
                     SizedBox(height: 20),
                     Center(

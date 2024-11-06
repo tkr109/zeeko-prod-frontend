@@ -118,7 +118,7 @@ class AuthCheckScreen extends StatelessWidget {
     if (token == null || token.isEmpty) {
       context.go('/options'); // Navigate to options screen if not authenticated
     } else {
-      context.goNamed('groups'); // Navigate to Groups page if authenticated
+      context.go('/home'); // Navigate to Groups page if authenticated
     }
   }
 
