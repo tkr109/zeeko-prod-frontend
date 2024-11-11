@@ -1,5 +1,3 @@
-// lib/routes/app_router.dart
-
 import 'package:flutter/material.dart';
 import 'package:frontend/groupInfo/Add/AddEventPage.dart';
 import 'package:frontend/groupInfo/Add/AddPollPage.dart';
@@ -12,18 +10,14 @@ import 'package:frontend/inital/groupspage.dart';
 import 'package:frontend/inital/homepage.dart';
 import 'package:frontend/inital/messagespage.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../onboarding/options_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/check-auth',
+    initialLocation: '/home', // Set /home as the initial location
     routes: [
       GoRoute(
-        path: '/check-auth',
-        builder: (context, state) => AuthCheckScreen(),
-      ),
-      GoRoute(
+        name: 'options',
         path: '/options',
         builder: (context, state) => OptionsScreen(),
       ),
@@ -59,15 +53,14 @@ class AppRouter {
                     },
                   ),
                   GoRoute(
-                    path: 'subgroups', // Define route for SubgroupsPage
+                    path: 'subgroups',
                     builder: (context, state) {
                       final groupId = state.pathParameters['groupId']!;
-                      return SubgroupsPage(
-                          groupId: groupId); // Pass groupId to SubgroupsPage
+                      return SubgroupsPage(groupId: groupId);
                     },
                   ),
                   GoRoute(
-                    path: 'add-post/:subgroupId', // Route for AddPostPage
+                    path: 'add-post/:subgroupId',
                     builder: (context, state) {
                       final groupId = state.pathParameters['groupId']!;
                       final subgroupId = state.pathParameters['subgroupId']!;
@@ -76,7 +69,7 @@ class AppRouter {
                     },
                   ),
                   GoRoute(
-                    path: 'add-poll/:subgroupId', // Route for AddPollPage
+                    path: 'add-poll/:subgroupId',
                     builder: (context, state) {
                       final groupId = state.pathParameters['groupId']!;
                       final subgroupId = state.pathParameters['subgroupId']!;
@@ -108,23 +101,4 @@ class AppRouter {
       ),
     ],
   );
-}
-
-class AuthCheckScreen extends StatelessWidget {
-  Future<void> _checkAuthStatus(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token == null || token.isEmpty) {
-      context.go('/options'); // Navigate to options screen if not authenticated
-    } else {
-      context.go('/home'); // Navigate to Groups page if authenticated
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    _checkAuthStatus(context);
-    return Scaffold(body: Center(child: CircularProgressIndicator()));
-  }
 }

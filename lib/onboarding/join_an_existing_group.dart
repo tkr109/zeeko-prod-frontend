@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants.dart';
 import 'package:frontend/homepage.dart';
 import 'package:frontend/widgets/get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 
 class JoinAnExistingGroupScreen extends StatefulWidget {
   @override
@@ -52,7 +54,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
   }
 
   Future<void> verifyOtp(String email, String otp) async {
-    final url = Uri.parse("http://192.168.100.12:5000/api/auth/verify-otp");
+    final url = Uri.parse("${Constants.serverUrl}/api/auth/verify-otp");
 
     try {
       final response = await http.post(
@@ -71,10 +73,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
         token = data['token']; // Extract JWT token from response
         print('OTP verified successfully. Token: $token');
         saveUserState(data['token'], emailController.text);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
+        context.go('/home');
         // Handle successful verification (e.g., navigate to a new screen, store the token)
       } else {
         print('Invalid OTP or request failed. Message: ${response.body}');
@@ -98,7 +97,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
     print("--------------------------------------");
 
     var response = await http.post(
-      Uri.parse('http://192.168.100.12:5000/api/auth/addUser'),
+      Uri.parse('${Constants.serverUrl}/api/auth/addUser'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'firstName': firstNameController.text,
@@ -127,12 +126,13 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
     print("---------------------jiii---------------------");
 
     final url = Uri.parse(
-        'http://192.168.100.12:5000/api/group/join'); // Replace with your backend URL
+        '${Constants.serverUrl}/api/group/join'); // Replace with your backend URL
 
     try {
       // Prepare the request body
       final body = jsonEncode({
         'groupCode': groupCode,
+        'name': firstNameController.text,
         'email': email,
       });
 
@@ -150,7 +150,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
       // Handle the response
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data['msg']); // Display success message
+        print('response body : ${data['msg']}'); // Display success message
       } else {
         final errorData = jsonDecode(response.body);
         print('Error: ${errorData['msg']}'); // Display error message

@@ -26,6 +26,8 @@ class _GroupsPageState extends State<GroupsPage> {
     String? userId = prefs.getString('userId');
     String? token = prefs.getString('token');
 
+    print('Group page USer id : ${userId}');
+    print('Group page Token : ${token}');
     if (userId == null || token == null) {
       showSnackbar(context, "User ID or token not found. Please log in again.",
           isError: true);

@@ -65,6 +65,88 @@ class _MembershipPageState extends State<MembershipPage> {
     }
   }
 
+  Future<void> _handleAcceptRequest(Map<String, dynamic> request) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final url = Uri.parse('${Constants.serverUrl}/api/group/acceptRequest');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'groupId': widget.groupId,
+          'email': request['email'],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Request accepted successfully.")),
+        );
+        // Optionally, refresh the data to update the UI
+        setState(() {
+          pendingRequests
+              .removeWhere((req) => req['email'] == request['email']);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to accept request.")),
+        );
+      }
+      _fetchGroupData();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Error occurred while accepting request.")),
+      );
+    }
+  }
+
+  Future<void> _handleRejectRequest(Map<String, dynamic> request) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final url = Uri.parse('${Constants.serverUrl}/api/group/deleteRequest');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'groupId': widget.groupId,
+          'email': request['email'],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Request rejected successfully.")),
+        );
+        // Optionally, refresh the data to update the UI
+        setState(() {
+          pendingRequests
+              .removeWhere((req) => req['email'] == request['email']);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to reject request.")),
+        );
+      }
+      _fetchGroupData();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Error occurred while rejecting request.")),
+      );
+    }
+  }
+
   String formatDate(String date) {
     final parsedDate = DateTime.parse(date);
     return DateFormat('dd-MMM-yyyy').format(parsedDate);
@@ -165,19 +247,38 @@ class _MembershipPageState extends State<MembershipPage> {
                     ),
                   ),
                 if (pendingRequests.isNotEmpty)
-                  ListView.builder(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    itemCount: pendingRequests.length,
-                    itemBuilder: (context, index) {
-                      final request = pendingRequests[index];
-                      return PendingRequestCard(
-                        name: request['name'],
-                        email: request['email'],
-                        date: formatDate(request['date']),
-                      );
-                    },
-                  ),
+                  if (pendingRequests.isNotEmpty)
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      itemCount: pendingRequests.length,
+                      itemBuilder: (context, index) {
+                        final request = pendingRequests[index];
+                        return Dismissible(
+                          key: Key(request['email']),
+                          background: _buildSwipeAction(
+                              Icons.check, Colors.green, "Accept"),
+                          secondaryBackground: _buildSwipeAction(
+                              Icons.close, Colors.red, "Reject"),
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.startToEnd) {
+                              _handleAcceptRequest(request);
+                            } else {
+                              _handleRejectRequest(request);
+                            }
+                            setState(() {
+                              pendingRequests.removeAt(index);
+                            });
+                          },
+                          child: PendingRequestCard(
+                            name: request['name'],
+                            email: request['email'],
+                            date: formatDate(request['date']),
+                          ),
+                        );
+                      },
+                    ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 8.0),
@@ -210,6 +311,14 @@ class _MembershipPageState extends State<MembershipPage> {
                 ),
               ],
             ),
+    );
+  }
+
+  Widget _buildSwipeAction(IconData icon, Color color, String label) {
+    return Container(
+      color: color,
+      alignment: Alignment.center,
+      child: Icon(icon, color: Colors.white, size: 30),
     );
   }
 }

@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
 import 'package:frontend/widgets/event_card.dart';
+import 'package:frontend/widgets/section_tile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DisplayUserEvents extends StatefulWidget {
-  final List<String> groupIds;
-  final String userId;
-
-  const DisplayUserEvents({
-    required this.groupIds,
-    required this.userId,
-    Key? key,
-  }) : super(key: key);
+  const DisplayUserEvents({Key? key}) : super(key: key);
 
   @override
   _DisplayUserEventsState createState() => _DisplayUserEventsState();
@@ -21,11 +16,32 @@ class DisplayUserEvents extends StatefulWidget {
 class _DisplayUserEventsState extends State<DisplayUserEvents> {
   List<Map<String, dynamic>> events = [];
   bool isLoading = true;
+  List<String> groupIds = [];
+  String? userId;
 
   @override
   void initState() {
     super.initState();
-    fetchUserEvents();
+    _loadUserDataAndFetchEvents();
+  }
+
+  Future<void> _loadUserDataAndFetchEvents() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('userId');
+    groupIds = prefs.getStringList('groupIds') ?? []; // Use group IDs
+
+    if (userId != null && groupIds.isNotEmpty) {
+      await fetchUserEvents();
+    } else {
+      print("User ID or Group IDs not found in SharedPreferences");
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> fetchUserEvents() async {
@@ -34,14 +50,14 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
         Uri.parse('${Constants.serverUrl}/api/group/userSubgroupEvents'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'groupIds': widget.groupIds,
-          'userId': widget.userId,
+          'groupIds': groupIds,
+          'userId': userId,
         }),
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> eventList = json.decode(response.body)['events'];
-
+        print(response);
         setState(() {
           events = eventList
               .map((e) => {
@@ -50,6 +66,9 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
                     "location": e['location'],
                     "imageUrl":
                         e['bannerImage'] ?? 'https://via.placeholder.com/150',
+                    "description": e['description'],
+                    "responses": e['responses'] ?? {},
+                    "isAcceptingResponses": e['isAcceptingResponses'],
                   })
               .toList();
           isLoading = false;
@@ -91,7 +110,6 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("User Events")),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -100,13 +118,7 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'This Week',
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                    ),
+                    SectionTitle(title: 'This week'),
                     ...events.map((event) => EventCard(
                           title: event['title'],
                           date: event['date'],
