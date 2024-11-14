@@ -35,14 +35,12 @@ class _HomePageState extends State<HomePage> {
     print(token);
     print(userId);
 
-    // Check if userId, email, or token is missing
     if (userId == "" || email == "" || token == "") {
       _showSnackbar("User session not found. Redirecting to login.");
       GoRouter.of(context).goNamed('options');
       return;
     }
 
-    // Fetch user groups if session is valid
     _fetchUserGroups();
   }
 
@@ -101,13 +99,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
-    await prefs.remove('email');
-    GoRouter.of(context).goNamed('options');
-  }
-
   Widget _getSectionContent() {
     switch (_selectedSection) {
       case 0:
@@ -140,54 +131,38 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          Icon(Icons.notifications, color: Colors.black),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.grey,
-              radius: 18,
+          GestureDetector(
+            onTap: () {
+              GoRouter.of(context).goNamed('about');
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.grey,
+                radius: 18,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
             ),
           ),
         ],
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Stack(
+          : Column(
               children: [
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildSectionButton("Events", 0),
-                          _buildSectionButton("Posts", 1),
-                          _buildSectionButton("Payments", 2),
-                          _buildSectionButton("Polls", 3),
-                        ],
-                      ),
-                    ),
-                    Expanded(child: _getSectionContent()),
-                  ],
-                ),
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _logout(context),
-                    icon: Icon(Icons.logout, color: Colors.white),
-                    label: Text("Logout"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildSectionButton("Events", 0),
+                      _buildSectionButton("Posts", 1),
+                      _buildSectionButton("Payments", 2),
+                      _buildSectionButton("Polls", 3),
+                    ],
                   ),
                 ),
+                Expanded(child: _getSectionContent()),
               ],
             ),
     );

@@ -69,10 +69,42 @@ class _MembershipPageState extends State<MembershipPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
-    final url = Uri.parse('${Constants.serverUrl}/api/group/acceptRequest');
+    final subgroupsUrl = Uri.parse(
+        '${Constants.serverUrl}/api/group/subgroups/${widget.groupId}');
+    final acceptUrl =
+        Uri.parse('${Constants.serverUrl}/api/group/acceptRequest');
+
     try {
+      // Fetch the list of subgroups
+      final subgroupsResponse = await http.get(
+        subgroupsUrl,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (subgroupsResponse.statusCode != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to fetch subgroups.")),
+        );
+        return;
+      }
+
+      final subgroupsData = jsonDecode(subgroupsResponse.body);
+      final subgroups =
+          List<Map<String, dynamic>>.from(subgroupsData['subgroups']);
+
+      // Show the subgroup selection dialog
+      final selectedSubgroups = await _showSubgroupSelectionDialog(subgroups);
+
+      if (selectedSubgroups == null || selectedSubgroups.isEmpty) {
+        return;
+      }
+
+      // Prepare the request body for accepting the request
       final response = await http.post(
-        url,
+        acceptUrl,
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -80,6 +112,7 @@ class _MembershipPageState extends State<MembershipPage> {
         body: jsonEncode({
           'groupId': widget.groupId,
           'email': request['email'],
+          'subgroupIds': selectedSubgroups,
         }),
       );
 
@@ -87,7 +120,6 @@ class _MembershipPageState extends State<MembershipPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Request accepted successfully.")),
         );
-        // Optionally, refresh the data to update the UI
         setState(() {
           pendingRequests
               .removeWhere((req) => req['email'] == request['email']);
@@ -104,6 +136,55 @@ class _MembershipPageState extends State<MembershipPage> {
             content: Text("Error occurred while accepting request.")),
       );
     }
+  }
+
+  Future<List<String>?> _showSubgroupSelectionDialog(
+      List<Map<String, dynamic>> subgroups) async {
+    List<String> selectedSubgroupIds = [];
+
+    return await showDialog<List<String>>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Select Subgroups"),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: subgroups.map((subgroup) {
+                    return CheckboxListTile(
+                      title: Text(subgroup['name']),
+                      value: selectedSubgroupIds.contains(subgroup['id']),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            selectedSubgroupIds.add(subgroup['id']);
+                          } else {
+                            selectedSubgroupIds.remove(subgroup['id']);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: const Text("Cancel"),
+                  onPressed: () => Navigator.of(context).pop(null),
+                ),
+                TextButton(
+                  child: const Text("Confirm"),
+                  onPressed: () =>
+                      Navigator.of(context).pop(selectedSubgroupIds),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _handleRejectRequest(Map<String, dynamic> request) async {

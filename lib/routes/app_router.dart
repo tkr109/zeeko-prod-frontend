@@ -3,6 +3,7 @@ import 'package:frontend/groupInfo/Add/AddEventPage.dart';
 import 'package:frontend/groupInfo/Add/AddPollPage.dart';
 import 'package:frontend/groupInfo/Add/AddPostPage.dart';
 import 'package:frontend/groupInfo/SubgroupsPage.dart';
+import 'package:frontend/inital/aboutpage.dart';
 import 'package:frontend/inital/main_layout.dart';
 import 'package:frontend/groupInfo/GroupDetailsPage.dart';
 import 'package:frontend/groupInfo/MembershipPage.dart';
@@ -30,6 +31,11 @@ class AppRouter {
             pageBuilder: (context, state) => NoTransitionPage(
               child: HomePage(),
             ),
+          ),
+          GoRoute(
+            name: 'about',
+            path: '/about',
+            builder: (context, state) => AboutPage(),
           ),
           GoRoute(
             path: '/home/groups',
