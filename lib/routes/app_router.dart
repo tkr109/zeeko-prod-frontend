@@ -3,6 +3,7 @@ import 'package:frontend/groupInfo/Add/AddEventPage.dart';
 import 'package:frontend/groupInfo/Add/AddPollPage.dart';
 import 'package:frontend/groupInfo/Add/AddPostPage.dart';
 import 'package:frontend/groupInfo/SubgroupsPage.dart';
+import 'package:frontend/inital/Details/eventsDetailsPage.dart';
 import 'package:frontend/inital/aboutpage.dart';
 import 'package:frontend/inital/main_layout.dart';
 import 'package:frontend/groupInfo/GroupDetailsPage.dart';
@@ -36,6 +37,14 @@ class AppRouter {
             name: 'about',
             path: '/about',
             builder: (context, state) => AboutPage(),
+          ),
+          GoRoute(
+            path: '/event-details/:eventId',
+            name: 'eventDetails',
+            builder: (context, state) {
+              final eventId = state.pathParameters['eventId']!;
+              return EventDetailsPage(eventId: eventId);
+            },
           ),
           GoRoute(
             path: '/home/groups',

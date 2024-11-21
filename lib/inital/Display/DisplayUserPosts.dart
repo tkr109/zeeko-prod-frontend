@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
+import 'package:frontend/inital/Details/postDetailPage.dart';
 import 'package:frontend/widgets/post_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -53,15 +54,25 @@ class _DisplayUserPostsState extends State<DisplayUserPosts> {
         }),
       );
 
+      print(response.body);
+
       if (response.statusCode == 200) {
         final List<dynamic> postList =
             json.decode(response.body)['posts'] ?? [];
         setState(() {
           posts = postList.map((post) {
+            // Ensure fields are not null before accessing them
+            final postId = post['_id']?.toString() ?? '';
+            final title = post['title']?.toString() ?? 'No Title';
+            final description =
+                post['description']?.toString() ?? 'No Description';
+            final date = formatDate(post['date']?.toString() ?? '');
+
             return {
-              "title": post['title'] ?? 'No Title',
-              "description": (post['description'] ?? '').toString(),
-              "date": formatDate(post['date'] ?? ''),
+              "postId": postId,
+              "title": title,
+              "description": description,
+              "date": date,
             };
           }).toList();
           isLoading = false;
@@ -117,10 +128,26 @@ class _DisplayUserPostsState extends State<DisplayUserPosts> {
               padding: const EdgeInsets.all(16.0),
               itemCount: posts.length,
               itemBuilder: (context, index) {
-                return PostCard(
-                  title: posts[index]['title'] ?? 'No Title',
-                  date: posts[index]['date'] ?? 'No Date',
-                  description: posts[index]['description'] ?? 'No Description',
+                return GestureDetector(
+                  onTap: () {
+                    final postId = posts[index]['postId'];
+                    if (postId != null && postId.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PostDetailsPage(postId: postId),
+                        ),
+                      );
+                    } else {
+                      _showSnackbar(context, "Invalid Post ID", isError: true);
+                    }
+                  },
+                  child: PostCard(
+                    title: posts[index]['title'] ?? 'No Title',
+                    date: posts[index]['date'] ?? 'No Date',
+                    description:
+                        posts[index]['description'] ?? 'No Description',
+                  ),
                 );
               },
             ),

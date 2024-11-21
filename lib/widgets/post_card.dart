@@ -17,13 +17,12 @@ class PostCard extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black, // Dark background color
+        color: Colors.black,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title
           Text(
             title,
             style: TextStyle(
@@ -32,11 +31,9 @@ class PostCard extends StatelessWidget {
               color: Colors.white,
             ),
             maxLines: 1,
-            overflow: TextOverflow.ellipsis, // Truncate title if too long
+            overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: 8),
-
-          // Description and Date
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -48,7 +45,7 @@ class PostCard extends StatelessWidget {
                     color: Colors.grey[400],
                   ),
                   maxLines: 1,
-                  overflow: TextOverflow.ellipsis, // Show only one line
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               SizedBox(width: 8),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
+import 'package:frontend/inital/Details/pollsDetailsPage.dart';
 import 'package:frontend/widgets/poll_card.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -57,8 +58,9 @@ class _DisplayUserPollsState extends State<DisplayUserPolls> {
         final data = json.decode(response.body);
         setState(() {
           polls = List<Map<String, dynamic>>.from(data['polls'].map((poll) => {
-                "title": poll['description'],
-                "postedDate": formatDate(poll['createdAt']),
+                "id": poll['_id'] ?? '', // Ensure we include the poll ID
+                "title": poll['description'] ?? 'No Title',
+                "postedDate": formatDate(poll['createdAt'] ?? ''),
               }));
           isLoading = false;
         });
@@ -113,11 +115,23 @@ class _DisplayUserPollsState extends State<DisplayUserPolls> {
           : ListView.builder(
               itemCount: polls.length,
               itemBuilder: (context, index) {
+                final pollId = polls[index]['id'] ?? '';
+
+                if (pollId.isEmpty) {
+                  showSnackbar("Poll ID is missing.");
+                  return SizedBox.shrink(); // Skip rendering if ID is missing
+                }
+
                 return PollCard(
                   title: polls[index]['title']!,
                   postedDate: polls[index]['postedDate']!,
                   onTap: () {
-                    // Add any onTap functionality here, e.g., navigate to poll details
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PollDetailsPage(pollId: pollId),
+                      ),
+                    );
                   },
                 );
               },

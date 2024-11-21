@@ -56,9 +56,15 @@ class PollCard extends StatelessWidget {
               ),
               SizedBox(height: 8),
 
-              SizedBox(height: 12),
-
-              // "Posted" row
+              // Indication to view details
+              Text(
+                "Tap to view details",
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
             ],
           ),
         ),

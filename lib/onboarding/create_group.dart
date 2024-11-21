@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/constants.dart';
 import 'package:frontend/homepage.dart';
 import 'package:frontend/widgets/get_started.dart';
 import 'package:frontend/widgets/optionBox.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 
 class CreateGroupScreen extends StatefulWidget {
   @override
@@ -39,7 +41,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   Future<void> verifyOtp(String email, String otp) async {
-    final url = Uri.parse("http://192.168.100.12:5000/api/auth/verify-otp");
+    final url = Uri.parse('${Constants.serverUrl}/api/auth/verify-otp');
 
     try {
       final response = await http.post(
@@ -58,10 +60,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         final token = data['token']; // Extract JWT token from response
         print('OTP verified successfully. Token: $token');
         saveUserState(data['token'], emailController.text);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
+        context.go('/home');
         // Handle successful verification (e.g., navigate to a new screen, store the token)
       } else {
         print('Invalid OTP or request failed. Message: ${response.body}');
@@ -86,7 +85,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     print("--------------------------------------");
 
     var response = await http.post(
-      Uri.parse('http://192.168.100.12:5000/api/auth/register'),
+      Uri.parse('${Constants.serverUrl}/api/auth/register'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'firstName': firstNameController.text,

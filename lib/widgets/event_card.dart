@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class EventCard extends StatelessWidget {
+  final String id;
   final String title;
   final String date;
   final String location;
@@ -8,6 +9,7 @@ class EventCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const EventCard({
+    required this.id,
     required this.title,
     required this.date,
     required this.location,

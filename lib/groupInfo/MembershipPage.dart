@@ -17,8 +17,10 @@ class MembershipPage extends StatefulWidget {
 class _MembershipPageState extends State<MembershipPage> {
   bool _isMembersSelected = true;
   List<Map<String, dynamic>> members = [];
+  List<Map<String, dynamic>> admins = [];
   List<Map<String, dynamic>> pendingRequests = [];
   bool isLoading = true;
+  bool isAdmin = false;
 
   @override
   void initState() {
@@ -45,8 +47,9 @@ class _MembershipPageState extends State<MembershipPage> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
-          members = List<Map<String, dynamic>>.from(
-              data['members'].map((name) => {'name': name}));
+          members = List<Map<String, dynamic>>.from(data['members']);
+          admins =
+              List<Map<String, dynamic>>.from(data['admins']); // Add this line
           pendingRequests =
               List<Map<String, dynamic>>.from(data['pendingRequests']);
           isLoading = false;
@@ -380,11 +383,14 @@ class _MembershipPageState extends State<MembershipPage> {
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    itemCount: members.length,
+                    itemCount:
+                        _isMembersSelected ? members.length : admins.length,
                     itemBuilder: (context, index) {
-                      final member = members[index];
+                      final user =
+                          _isMembersSelected ? members[index] : admins[index];
                       return MemberCard(
-                        name: member['name'],
+                        name: "${user['fullName']}", // Updated for admins
+                        email: user['email'],
                         role: _isMembersSelected ? 'Member' : 'Administrator',
                       );
                     },
@@ -406,9 +412,14 @@ class _MembershipPageState extends State<MembershipPage> {
 
 class MemberCard extends StatelessWidget {
   final String name;
+  final String email;
   final String role;
 
-  const MemberCard({required this.name, required this.role});
+  const MemberCard({
+    required this.name,
+    required this.email,
+    required this.role,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -417,8 +428,23 @@ class MemberCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-        title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: role == 'Administrator' ? Text(role) : null,
+        title: Text(
+          name,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              email,
+              style: TextStyle(color: Colors.grey[700]),
+            ),
+            Text(
+              role,
+              style: TextStyle(color: Colors.grey[500]),
+            ), // Always return Text
+          ],
+        ),
         leading: CircleAvatar(
           backgroundColor: Colors.grey[300],
           child: Text(name[0]),

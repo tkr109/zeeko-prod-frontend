@@ -38,6 +38,7 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
         setState(() {
           events = eventList
               .map((e) => {
+                    "id": e['_id'],
                     "title": e['title'],
                     "date": formatDate(e['timings']),
                     "location": e['location'],
@@ -108,6 +109,7 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
                   children: [
                     SectionTitle(title: 'This Week'),
                     ...events.map((event) => EventCard(
+                          id: event['id'],
                           title: event['title'],
                           date: event['date'],
                           location: event['location'],
