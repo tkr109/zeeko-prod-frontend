@@ -31,6 +31,7 @@ class _MembershipPageState extends State<MembershipPage> {
   Future<void> _fetchGroupData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
+    String? currentUserId = prefs.getString('userId'); // Get current user's ID
 
     final url = Uri.parse(
         '${Constants.serverUrl}/api/group/groupMembers/${widget.groupId}');
@@ -46,13 +47,20 @@ class _MembershipPageState extends State<MembershipPage> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print(data);
         setState(() {
           members = List<Map<String, dynamic>>.from(data['members']);
-          admins =
-              List<Map<String, dynamic>>.from(data['admins']); // Add this line
+          admins = List<Map<String, dynamic>>.from(data['admins']);
           pendingRequests =
               List<Map<String, dynamic>>.from(data['pendingRequests']);
           isLoading = false;
+
+          print("Current User ID: $currentUserId");
+          print("API Response (Admins): ${data['admins']}");
+
+          // Check if current user is an admin
+          isAdmin = admins.any((admin) => admin['_id'] == currentUserId);
+          print("Is Admin: $isAdmin");
         });
       } else {
         setState(() {
@@ -69,6 +77,13 @@ class _MembershipPageState extends State<MembershipPage> {
   }
 
   Future<void> _handleAcceptRequest(Map<String, dynamic> request) async {
+    if (!isAdmin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Only admins can accept requests.")),
+      );
+      return;
+    }
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -102,6 +117,9 @@ class _MembershipPageState extends State<MembershipPage> {
       final selectedSubgroups = await _showSubgroupSelectionDialog(subgroups);
 
       if (selectedSubgroups == null || selectedSubgroups.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No subgroups selected.")),
+        );
         return;
       }
 
@@ -191,6 +209,13 @@ class _MembershipPageState extends State<MembershipPage> {
   }
 
   Future<void> _handleRejectRequest(Map<String, dynamic> request) async {
+    if (!isAdmin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Only admins can reject requests.")),
+      );
+      return;
+    }
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -212,7 +237,6 @@ class _MembershipPageState extends State<MembershipPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Request rejected successfully.")),
         );
-        // Optionally, refresh the data to update the UI
         setState(() {
           pendingRequests
               .removeWhere((req) => req['email'] == request['email']);
@@ -331,38 +355,44 @@ class _MembershipPageState extends State<MembershipPage> {
                     ),
                   ),
                 if (pendingRequests.isNotEmpty)
-                  if (pendingRequests.isNotEmpty)
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      itemCount: pendingRequests.length,
-                      itemBuilder: (context, index) {
-                        final request = pendingRequests[index];
-                        return Dismissible(
-                          key: Key(request['email']),
-                          background: _buildSwipeAction(
-                              Icons.check, Colors.green, "Accept"),
-                          secondaryBackground: _buildSwipeAction(
-                              Icons.close, Colors.red, "Reject"),
-                          onDismissed: (direction) {
-                            if (direction == DismissDirection.startToEnd) {
-                              _handleAcceptRequest(request);
-                            } else {
-                              _handleRejectRequest(request);
-                            }
-                            setState(() {
-                              pendingRequests.removeAt(index);
-                            });
-                          },
-                          child: PendingRequestCard(
-                            name: request['name'],
-                            email: request['email'],
-                            date: formatDate(request['date']),
-                          ),
-                        );
-                      },
-                    ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    itemCount: pendingRequests.length,
+                    itemBuilder: (context, index) {
+                      final request = pendingRequests[index];
+
+                      return isAdmin
+                          ? Dismissible(
+                              key: Key(request['email']),
+                              background: _buildSwipeAction(
+                                  Icons.check, Colors.green, "Accept"),
+                              secondaryBackground: _buildSwipeAction(
+                                  Icons.close, Colors.red, "Reject"),
+                              onDismissed: (direction) {
+                                if (direction == DismissDirection.startToEnd) {
+                                  _handleAcceptRequest(request);
+                                } else {
+                                  _handleRejectRequest(request);
+                                }
+                                setState(() {
+                                  pendingRequests.removeAt(index);
+                                });
+                              },
+                              child: PendingRequestCard(
+                                name: request['name'],
+                                email: request['email'],
+                                date: formatDate(request['date']),
+                              ),
+                            )
+                          : PendingRequestCard(
+                              name: request['name'],
+                              email: request['email'],
+                              date: formatDate(request['date']),
+                            );
+                    },
+                  ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 8.0),
