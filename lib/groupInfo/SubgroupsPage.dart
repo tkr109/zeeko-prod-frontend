@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SubgroupsPage extends StatefulWidget {
   final String groupId;
@@ -16,11 +17,41 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
   final TextEditingController _subgroupNameController = TextEditingController();
   List<Map<String, dynamic>> _subgroups = []; // To store subgroup data
   bool isLoading = true;
+  bool isAdmin = false; // Track if the user is an admin
 
   @override
   void initState() {
     super.initState();
+    _fetchGroupData(); // Fetch group data to check admin status
     _fetchSubgroups(); // Fetch subgroups on page load
+  }
+
+  Future<void> _fetchGroupData() async {
+    final url = Uri.parse(
+        '${Constants.serverUrl}/api/group/groupMembers/${widget.groupId}');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final currentUserId =
+            await _getCurrentUserId(); // Fetch the current user's ID
+        setState(() {
+          isAdmin = data['admins'].any((admin) =>
+              admin['_id'] == currentUserId); // Check if user is admin
+        });
+
+        print(isAdmin);
+      } else {
+        print("Failed to fetch group data.");
+      }
+    } catch (e) {
+      print("Error fetching group data: $e");
+    }
+  }
+
+  Future<String?> _getCurrentUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId');
   }
 
   Future<void> _fetchSubgroups() async {
@@ -52,6 +83,11 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
   }
 
   Future<void> _addSubgroup(String subgroupName) async {
+    if (!isAdmin) {
+      _showSnackBar("Only admins can add subgroups");
+      return;
+    }
+
     final url = Uri.parse(
         '${Constants.serverUrl}/api/group/addSubgroup/${widget.groupId}');
 
@@ -108,6 +144,11 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
   }
 
   void _showAddSubgroupDrawer() {
+    if (!isAdmin) {
+      _showSnackBar("Only admins can add subgroups");
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(

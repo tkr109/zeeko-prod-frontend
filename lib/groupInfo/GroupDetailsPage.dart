@@ -32,6 +32,9 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
     super.initState();
     _fetchGroupDetails();
     _getUserSubgroup();
+    _checkAdminStatus();
+
+    print(_isAdmin);
   }
 
   Future<void> _fetchGroupDetails() async {
@@ -66,6 +69,42 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
       setState(() {
         groupName = 'Error loading group';
         isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _checkAdminStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    String? userId = prefs.getString('userId');
+
+    final url = Uri.parse(
+        '${Constants.serverUrl}/api/group/isAdmin/${widget.groupId}/${userId}');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      print('resp: ${response}');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print("Admin check");
+        print(data);
+        setState(() {
+          _isAdmin = data['isAdmin'] ?? false;
+        });
+      } else {
+        setState(() {
+          _isAdmin = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isAdmin = false;
       });
     }
   }
@@ -144,7 +183,6 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
   void _showBottomDrawer() {
     bool showingSubgroups = false;
     String selectedCategory = "";
-    String selectedSubgroupId = "";
 
     showModalBottomSheet(
       context: context,
@@ -170,17 +208,20 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                   ),
                   SizedBox(height: 16),
                   if (!showingSubgroups) ...[
-                    _buildDrawerItem(
-                      icon: Icons.event,
-                      text: "Events",
-                      onTap: () {
-                        setModalState(() {
-                          showingSubgroups = true;
-                          selectedCategory = "Events";
-                        });
-                        fetchAndDisplaySubgroups(setModalState);
-                      },
-                    ),
+                    // Show "Events" only for admins
+                    if (_isAdmin)
+                      _buildDrawerItem(
+                        icon: Icons.event,
+                        text: "Events",
+                        onTap: () {
+                          setModalState(() {
+                            showingSubgroups = true;
+                            selectedCategory = "Events";
+                          });
+                          fetchAndDisplaySubgroups(setModalState);
+                        },
+                      ),
+                    // Always show "Posts" and "Polls" for all users
                     _buildDrawerItem(
                       icon: Icons.post_add,
                       text: "Posts",
@@ -218,9 +259,11 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                           } else if (selectedCategory == "Polls") {
                             context.push(
                                 '/home/groups/group-details/${widget.groupId}/add-poll/${subgroup['id']}');
-                          } else if (selectedCategory == "Events") {
+                          } else if (selectedCategory == "Events" && _isAdmin) {
                             context.push(
                                 '/home/groups/group-details/${widget.groupId}/add-event/${subgroup['id']}');
+                          } else if (selectedCategory == "Events") {
+                            _showSnackBar("Only admins can add events.");
                           }
                         },
                       ),
@@ -248,7 +291,11 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.grey.shade800,
+      ),
     );
   }
 
@@ -378,7 +425,9 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showBottomDrawer,
+        onPressed: () {
+          _showBottomDrawer(); // Allow admins to access the drawer
+        },
         backgroundColor: Color(0xFFF8ECE0),
         child: Icon(Icons.add),
       ),

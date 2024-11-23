@@ -23,9 +23,10 @@ class EventCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         elevation: 6,
-        shadowColor: Colors.grey.withOpacity(0.3),
+        shadowColor: Colors.black.withOpacity(0.3),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        color: Colors.black, // Black background for the card
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
           child: Row(
@@ -38,11 +39,10 @@ class EventCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
                     imageUrl,
-                    fit: BoxFit
-                        .cover, // This ensures the image fully covers the container
+                    fit: BoxFit.cover, // Ensure the image covers the container
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[300],
-                      child: Icon(Icons.broken_image, color: Colors.grey[600]),
+                      color: Colors.grey[700],
+                      child: Icon(Icons.broken_image, color: Colors.white),
                     ),
                   ),
                 ),
@@ -60,7 +60,7 @@ class EventCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Colors.white, // White text for title
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -69,12 +69,14 @@ class EventCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(Icons.calendar_today,
-                              size: 16, color: Colors.grey[600]),
+                              size: 16,
+                              color: Colors.grey[400]), // Light grey icon
                           SizedBox(width: 5),
                           Text(
                             date,
                             style: TextStyle(
-                                color: Colors.grey[800], fontSize: 14),
+                                color: Colors.grey[400], // Light grey text
+                                fontSize: 14),
                           ),
                         ],
                       ),
@@ -82,13 +84,15 @@ class EventCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(Icons.location_on,
-                              size: 16, color: Colors.grey[600]),
+                              size: 16,
+                              color: Colors.grey[400]), // Light grey icon
                           SizedBox(width: 5),
                           Expanded(
                             child: Text(
                               location,
                               style: TextStyle(
-                                  color: Colors.grey[800], fontSize: 14),
+                                  color: Colors.grey[400], // Light grey text
+                                  fontSize: 14),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),

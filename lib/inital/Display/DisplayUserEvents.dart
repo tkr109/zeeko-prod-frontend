@@ -6,6 +6,7 @@ import 'package:frontend/widgets/section_tile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:go_router/go_router.dart';
 
 class DisplayUserEvents extends StatefulWidget {
   const DisplayUserEvents({Key? key}) : super(key: key);
@@ -168,12 +169,11 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
                             imageUrl: event['imageUrl'],
                             onTap: () {
                               if (eventId.isNotEmpty) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        EventDetailsPage(eventId: eventId),
-                                  ),
+                                context.goNamed(
+                                  'eventDetails', // Use the name defined in AppRouter
+                                  pathParameters: {
+                                    'eventId': eventId
+                                  }, // Pass the eventId as a route parameter
                                 );
                               } else {
                                 _showSnackbar("Event ID is missing.",

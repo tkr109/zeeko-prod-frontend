@@ -26,8 +26,6 @@ class _GroupsPageState extends State<GroupsPage> {
     String? userId = prefs.getString('userId');
     String? token = prefs.getString('token');
 
-    print('Group page USer id : ${userId}');
-    print('Group page Token : ${token}');
     if (userId == null || token == null) {
       showSnackbar(context, "User ID or token not found. Please log in again.",
           isError: true);
@@ -42,9 +40,6 @@ class _GroupsPageState extends State<GroupsPage> {
           'Authorization': 'Bearer $token',
         },
       );
-
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -139,36 +134,39 @@ class _GroupsPageState extends State<GroupsPage> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20),
-                    Text(
-                      "Groups Joined",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    SizedBox(height: 10),
-                    Column(
-                      children: joinedGroups.map((group) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              context.push(
-                                  '/home/groups/group-details/${group['id']}'); // Use context.push to keep navigation stack
-                            },
-                            child: GroupCircle(title: group['name']),
-                          ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  Text(
+                    "Groups Joined",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  SizedBox(height: 10),
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Two items per row
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 1, // Square items
+                      ),
+                      itemCount: joinedGroups.length,
+                      itemBuilder: (context, index) {
+                        final group = joinedGroups[index];
+                        return GestureDetector(
+                          onTap: () {
+                            context.push(
+                                '/home/groups/group-details/${group['id']}');
+                          },
+                          child: GroupCircle(title: group['name']),
                         );
-                      }).toList(),
+                      },
                     ),
-                    SizedBox(height: 20),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -266,6 +264,7 @@ class GroupCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         CircleAvatar(
           radius: 40,

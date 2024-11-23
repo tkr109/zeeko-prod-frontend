@@ -30,7 +30,8 @@ class _MainLayoutState extends State<MainLayout> {
   Future<void> _checkAuthAndFetchUserDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-
+    print("check");
+    print(token);
     if (token == null || token.isEmpty) {
       // Redirect to OptionsScreen if not authenticated
       print('main layout');
@@ -47,7 +48,7 @@ class _MainLayoutState extends State<MainLayout> {
   Future<void> _fetchAndStoreUserDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('email');
-
+    print("mainlayout");
     if (email == null) {
       print("No email found in SharedPreferences");
       return;
@@ -74,6 +75,7 @@ class _MainLayoutState extends State<MainLayout> {
         await prefs.setString('fullName', fullName!);
         await prefs.setString('email', email!);
         await prefs.setStringList('groupNames', groupNames!);
+        print(fullName);
 
         setState(() {});
       } else {

@@ -30,7 +30,7 @@ class AppRouter {
             path: '/home',
             name: 'home',
             pageBuilder: (context, state) => NoTransitionPage(
-              child: HomePage(),
+              child: MainLayout(child: HomePage()),
             ),
           ),
           GoRoute(
