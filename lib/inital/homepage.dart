@@ -18,14 +18,66 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> joinedGroups = [];
   List<String>? groupNames;
   bool isLoading = true;
+  String? fullName;
+  String? email;
+  String? userId;
 
   @override
   void initState() {
     super.initState();
+    _fetchAndStoreUserDetails();
     _checkUserSession();
   }
 
+  Future<void> _fetchAndStoreUserDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('email');
+    print("mainlayout");
+    if (email == null) {
+      print("No email found in SharedPreferences");
+      return;
+    }
+    try {
+      final url = Uri.parse('${Constants.serverUrl}/api/user/details');
+      print('main layout');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+      print("response code homepage");
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        final userData = jsonDecode(response.body);
+        print(userData);
+        userId = userData['_id'];
+        fullName = '${userData['firstName']} ${userData['lastName']}';
+        email = userData['email'];
+        groupNames = (userData['groups'] as List)
+            .map((group) => group['name'] as String)
+            .toList();
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        // Save details to SharedPreferences
+        await prefs.setString('userId', userId!);
+        await prefs.setString('fullName', fullName!);
+        await prefs.setString('email', email!);
+        await prefs.setStringList('groupNames', groupNames!);
+        print(fullName);
+
+        setState(() {});
+      } else {
+        print('Failed to fetch user details: ${response.body}');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+
   Future<void> _checkUserSession() async {
+    await Future.delayed(Duration(milliseconds: 300));
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
     String? email = prefs.getString('email');

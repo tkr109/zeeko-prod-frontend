@@ -3,6 +3,7 @@ import 'package:frontend/constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart'; // For date formatting
 import 'package:go_router/go_router.dart';
 
 class EventDetailsPage extends StatefulWidget {
@@ -17,8 +18,7 @@ class EventDetailsPage extends StatefulWidget {
 class _EventDetailsPageState extends State<EventDetailsPage> {
   Map<String, dynamic>? eventDetails;
   bool isLoading = true;
-  TextEditingController _commentController =
-      TextEditingController(); // Controller for comment input
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
@@ -28,7 +28,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   @override
   void dispose() {
-    _commentController.dispose(); // Dispose the controller when not needed
+    _commentController.dispose();
     super.dispose();
   }
 
@@ -47,8 +47,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         },
       );
 
-      print(httpResponse);
-
       if (httpResponse.statusCode == 200) {
         setState(() {
           eventDetails = json.decode(httpResponse.body);
@@ -65,70 +63,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
-  void _showSnackbar(String message, {bool isError = false}) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: isError ? Colors.red : Colors.green,
-      duration: Duration(seconds: 3),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  Future<void> _addComment() async {
-    final commentText = _commentController.text.trim();
-    if (commentText.isEmpty) {
-      _showSnackbar('Comment cannot be empty', isError: true);
-      return;
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final userId = prefs.getString('userId');
-    final userName = prefs.getString(
-        'userName'); // Ensure userName is stored in SharedPreferences
-
-    if (userId == null || userName == null) {
-      _showSnackbar('User not logged in', isError: true);
-      return;
-    }
-
-    try {
-      final url = Uri.parse(
-          '${Constants.serverUrl}/api/event/addComment/${widget.eventId}');
-      final httpResponse = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode({
-          'userId': userId,
-          'userName': userName,
-          'content': commentText,
-        }),
-      );
-
-      if (httpResponse.statusCode == 200) {
-        _showSnackbar('Comment added successfully!');
-        _commentController.clear();
-        _fetchEventDetails(); // Refresh event details to get updated comments
-      } else {
-        final responseBody = json.decode(httpResponse.body);
-        _showSnackbar(responseBody['message'] ?? 'Failed to add comment',
-            isError: true);
-      }
-    } catch (error) {
-      _showSnackbar('Error adding comment: $error', isError: true);
-    }
-  }
-
   Future<void> _submitResponse(String userResponse) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final userId = prefs.getString('userId');
 
     if (userId == null) {
-      _showSnackbar("User not logged in", isError: true);
+      _showSnackbar('User not logged in', isError: true);
       return;
     }
 
@@ -148,228 +89,343 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       );
 
       if (httpResponse.statusCode == 200) {
-        _showSnackbar("Response submitted successfully!");
-        _fetchEventDetails(); // Refresh the event details after submission
+        _showSnackbar('Response submitted successfully!');
+        _fetchEventDetails(); // Refresh event details to reflect new response
       } else {
         final responseBody = json.decode(httpResponse.body);
-        _showSnackbar(responseBody['message'] ?? "Failed to submit response",
+        _showSnackbar(responseBody['message'] ?? 'Failed to submit response',
             isError: true);
       }
     } catch (error) {
-      _showSnackbar("Error submitting response: $error", isError: true);
+      _showSnackbar('Error submitting response: $error', isError: true);
     }
+  }
+
+  void _showSnackbar(String message, {bool isError = false}) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: isError ? Colors.red : Colors.green,
+      duration: const Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future<void> _addComment() async {
+    final commentText = _commentController.text.trim();
+    if (commentText.isEmpty) {
+      _showSnackbar('Comment cannot be empty', isError: true);
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final userId = prefs.getString('userId');
+
+    if (userId == null) {
+      _showSnackbar('User not logged in', isError: true);
+      return;
+    }
+
+    try {
+      final url = Uri.parse(
+          '${Constants.serverUrl}/api/event/addComment/${widget.eventId}');
+      final httpResponse = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'userId': userId,
+          'comment': commentText,
+        }),
+      );
+
+      if (httpResponse.statusCode == 200) {
+        _showSnackbar('Comment added successfully!');
+        _commentController.clear();
+        _fetchEventDetails(); // Refresh event details to reflect the new comment
+      } else {
+        final responseBody = json.decode(httpResponse.body);
+        _showSnackbar(responseBody['message'] ?? 'Failed to add comment',
+            isError: true);
+      }
+    } catch (error) {
+      _showSnackbar('Error adding comment: $error', isError: true);
+    }
+  }
+
+  String _formatDate(String? isoDate) {
+    if (isoDate == null) return 'N/A';
+    final DateTime dateTime = DateTime.parse(isoDate);
+    return DateFormat('EEE, MMM d, y h:mm a').format(dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Event Details', style: TextStyle(color: Colors.black)),
+        title:
+            const Text('Event Details', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => context.goNamed('home'),
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 150),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Event Banner Image with Placeholder
-                        Container(
-                          height: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                eventDetails?['bannerImage'] ??
-                                    'https://via.placeholder.com/150',
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
+          ? const Center(child: CircularProgressIndicator())
+          : eventDetails == null || eventDetails!.isEmpty
+              ? const Center(child: Text('Failed to load event details.'))
+              : _buildEventDetails(),
+      floatingActionButton: _buildFloatingButtons(),
+    );
+  }
 
-                        // Event Title
-                        Text(
-                          eventDetails?['title'] ?? 'Event Title',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 10),
+  Widget _buildEventDetails() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildEventBanner(),
+          const SizedBox(height: 20),
+          _buildEventInfo(),
+          const SizedBox(height: 20),
+          _buildResponsesSummary(),
+          const Divider(),
+          const SizedBox(height: 20),
+          const Text(
+            'Comments:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          const SizedBox(height: 8),
+          // Place the comment box above the comments list
+          _buildWriteCommentField(),
+          const SizedBox(height: 10),
+          _buildCommentsSection(),
+          const SizedBox(height: 65),
+        ],
+      ),
+    );
+  }
 
-                        // Host Information
-                        Text(
-                          'Host: ${eventDetails?['hostName'] ?? 'Unknown'}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        SizedBox(height: 20),
+  Widget _buildEventBanner() {
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        image: DecorationImage(
+          image: NetworkImage(eventDetails?['bannerImage'] ??
+              'https://via.placeholder.com/150'),
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
 
-                        // Event Timing
-                        Row(
-                          children: [
-                            Icon(Icons.calendar_today, color: Colors.black),
-                            SizedBox(width: 10),
-                            Text(
-                              'Meet: ${eventDetails?['timings'] ?? 'Date & Time'}',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-
-                        // Event Location
-                        Row(
-                          children: [
-                            Icon(Icons.location_pin, color: Colors.black),
-                            SizedBox(width: 10),
-                            Text(
-                              eventDetails?['location'] ??
-                                  'Location not specified',
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-
-                        // Event Description
-                        Text(
-                          'Description',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          eventDetails?['description'] ??
-                              'No description provided.',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 30),
-
-                        // Responses Summary
-                        Divider(),
-                        Text(
-                          'Responses',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        ListTile(
-                          leading:
-                              Icon(Icons.check_circle, color: Colors.green),
-                          title: Text(
-                              '${eventDetails?['responses']['attending'] ?? 0} attending'),
-                        ),
-                        ListTile(
-                          leading:
-                              Icon(Icons.help_outline, color: Colors.orange),
-                          title: Text(
-                              '${eventDetails?['responses']['unanswered'] ?? 0} unanswered'),
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.cancel, color: Colors.red),
-                          title: Text(
-                              '${eventDetails?['responses']['declined'] ?? 0} declined'),
-                        ),
-
-                        // Comments Section
-                        Divider(),
-                        Text(
-                          'Comments',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        // Display comments
-                        eventDetails?['comments'] != null &&
-                                eventDetails!['comments'].isNotEmpty
-                            ? Column(
-                                children: List.generate(
-                                    eventDetails!['comments'].length, (index) {
-                                  final comment =
-                                      eventDetails!['comments'][index];
-                                  return ListTile(
-                                    leading: CircleAvatar(
-                                      child: Text(comment['userName'][0]
-                                          .toUpperCase()), // Display first letter of user name
-                                    ),
-                                    title: Text(comment['userName']),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(comment['content']),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          comment['timestamp'] ?? '',
-                                          style: TextStyle(
-                                              fontSize: 12, color: Colors.grey),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }),
-                              )
-                            : Text('No comments yet.'),
-                        SizedBox(height: 20),
-                        // Add Comment Input
-                        TextField(
-                          controller: _commentController,
-                          decoration: InputDecoration(
-                            labelText: 'Add a comment',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        // Submit Comment Button
-                        SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: _addComment,
-                          child: Text('Submit Comment'),
-                        ),
-                        SizedBox(height: 100), // Extra space at the bottom
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Floating Action Buttons for Responses
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  right: 20,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      FloatingActionButton.extended(
-                        onPressed: () => _submitResponse("Attending"),
-                        label: Text('Attend'),
-                        icon: Icon(Icons.check),
-                        backgroundColor: Colors.green,
-                      ),
-                      FloatingActionButton.extended(
-                        onPressed: () => _submitResponse("Declined"),
-                        label: Text('Decline'),
-                        icon: Icon(Icons.close),
-                        backgroundColor: Colors.red,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+  Widget _buildEventInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          eventDetails?['title'] ?? 'Event Title',
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const Icon(Icons.location_on, color: Colors.black),
+            const SizedBox(width: 8),
+            Text(
+              eventDetails?['location'] ?? 'Unknown Location',
+              style: const TextStyle(fontSize: 16),
             ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const Icon(Icons.schedule, color: Colors.black),
+            const SizedBox(width: 8),
+            Text(
+              'Timings: ${_formatDate(eventDetails?['timings'])}',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const Icon(Icons.timer, color: Colors.black),
+            const SizedBox(width: 8),
+            Text(
+              'Duration: ${eventDetails?['duration'] ?? 'N/A'} mins',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        const Text('Description',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 5),
+        Text(eventDetails?['description'] ?? 'No description provided.'),
+      ],
+    );
+  }
+
+  Widget _buildResponsesSummary() {
+    final responses = eventDetails?['responses'] ?? {};
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Responses',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        ListTile(
+          leading: const Icon(Icons.check_circle, color: Colors.green),
+          title: Text('Attending: ${responses['attending'] ?? 0}'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.help_outline, color: Colors.orange),
+          title: Text('Unanswered: ${responses['unanswered'] ?? 0}'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.cancel, color: Colors.red),
+          title: Text('Declined: ${responses['declined'] ?? 0}'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCommentsSection() {
+    final comments = eventDetails?['comments'] ?? [];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // const Text(
+        //   'Comments:',
+        //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        // ),
+        const SizedBox(height: 8),
+        comments.isNotEmpty
+            ? ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: comments.length,
+                itemBuilder: (context, index) {
+                  final comment = comments[index];
+                  return _buildComment(comment);
+                },
+              )
+            : const Text('No comments yet.'),
+      ],
+    );
+  }
+
+  Widget _buildComment(Map<String, dynamic> comment) {
+    return ListTile(
+      leading: CircleAvatar(
+        child: Icon(Icons.person),
+        backgroundColor: Colors.grey.shade300,
+      ),
+      title: Text(
+        comment['userId']?.toString() ?? 'Anonymous',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(comment['comment'] ?? 'No content'),
+          const SizedBox(height: 5),
+          Text(
+            _formatDate(comment['createdAt']),
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWriteCommentField() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _commentController,
+              decoration: const InputDecoration(
+                hintText: 'Write a comment...',
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 12),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.send, color: Colors.blue),
+            onPressed: _addComment,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatingButtons() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.black,
+              side: const BorderSide(color: Colors.green, width: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+            ),
+            onPressed: () {
+              _submitResponse('Attending');
+            },
+            child: const Text(
+              'ATTEND',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.black,
+              side: const BorderSide(color: Colors.red, width: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+            ),
+            onPressed: () {
+              _submitResponse('Declined');
+            },
+            child: const Text(
+              'DECLINE',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
