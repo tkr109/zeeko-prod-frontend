@@ -5,10 +5,10 @@ class GetStartedButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const GetStartedButton({
-    Key? key,
+    super.key,
     required this.buttonText,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class GetStartedButton extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(vertical: 15.0),
             elevation: 5,
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),

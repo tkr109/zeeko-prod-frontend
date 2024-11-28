@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PollDetailsPage extends StatefulWidget {
   final String pollId;
 
-  const PollDetailsPage({Key? key, required this.pollId}) : super(key: key);
+  const PollDetailsPage({super.key, required this.pollId});
 
   @override
   _PollDetailsPageState createState() => _PollDetailsPageState();
@@ -139,7 +139,7 @@ class _PollDetailsPageState extends State<PollDetailsPage> {
         elevation: 0,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -148,50 +148,50 @@ class _PollDetailsPageState extends State<PollDetailsPage> {
                   // Poll Description
                   Text(
                     pollDetails?['description'] ?? 'No Description',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Poll Options
-                  Text(
+                  const Text(
                     "Options:",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: pollOptions.length,
                     itemBuilder: (context, index) {
                       return _buildPollOptionCard(pollOptions[index]);
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Submit Vote Button using GetStartedButton widget
                   GetStartedButton(
                     buttonText: "Submit Vote",
                     onPressed: submitVote,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
                   Divider(color: Colors.grey[400], thickness: 2),
 
                   // Comments Section
-                  Text(
+                  const Text(
                     'Comments:',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
                       return _buildComment(comments[index]);
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -214,8 +214,8 @@ class _PollDetailsPageState extends State<PollDetailsPage> {
         }
       },
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8),
-        padding: EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: isSelected ? Colors.blue[50] : Colors.white,
           border:
@@ -226,7 +226,7 @@ class _PollDetailsPageState extends State<PollDetailsPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(option['option'],
-                style: TextStyle(fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             Text("${option['votes']} votes"),
           ],
         ),
@@ -237,7 +237,7 @@ class _PollDetailsPageState extends State<PollDetailsPage> {
   // Helper method to build each comment
   Widget _buildComment(Map<String, dynamic> comment) {
     return ListTile(
-      leading: CircleAvatar(child: Icon(Icons.person)),
+      leading: const CircleAvatar(child: Icon(Icons.person)),
       title: Text(comment['userId']?['firstName'] ?? 'Anonymous'),
       subtitle: Text(comment['comment']),
     );
@@ -246,17 +246,17 @@ class _PollDetailsPageState extends State<PollDetailsPage> {
   // Method to build the "Write a comment" input field
   Widget _buildWriteCommentField() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: _commentController,
-              decoration: InputDecoration(hintText: 'Write a comment...'),
+              decoration: const InputDecoration(hintText: 'Write a comment...'),
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send),
+            icon: const Icon(Icons.send),
             onPressed: () {
               submitComment(_commentController.text);
             },

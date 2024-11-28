@@ -11,7 +11,7 @@ import 'package:go_router/go_router.dart';
 class GroupDetailsPage extends StatefulWidget {
   final String groupId;
 
-  GroupDetailsPage({required this.groupId});
+  const GroupDetailsPage({super.key, required this.groupId});
 
   @override
   _GroupDetailsPageState createState() => _GroupDetailsPageState();
@@ -79,7 +79,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
     String? userId = prefs.getString('userId');
 
     final url = Uri.parse(
-        '${Constants.serverUrl}/api/group/isAdmin/${widget.groupId}/${userId}');
+        '${Constants.serverUrl}/api/group/isAdmin/${widget.groupId}/$userId');
 
     try {
       final response = await http.get(
@@ -89,7 +89,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
           'Content-Type': 'application/json',
         },
       );
-      print('resp: ${response}');
+      print('resp: $response');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         print("Admin check");
@@ -154,7 +154,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
     String? token = prefs.getString('token');
     String? userId = prefs.getString('userId');
     final url = Uri.parse(
-        '${Constants.serverUrl}/api/group/userSubgroups/${widget.groupId}/${userId}');
+        '${Constants.serverUrl}/api/group/userSubgroups/${widget.groupId}/$userId');
 
     try {
       final response = await http.get(
@@ -186,7 +186,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
 
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
@@ -203,10 +203,10 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                           ? "Select Subgroup for $selectedCategory"
                           : "Choose an Option",
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   if (!showingSubgroups) ...[
                     // Show "Events" only for admins
                     if (_isAdmin)
@@ -245,7 +245,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       },
                     ),
                   ] else if (_subgroupsLoading) ...[
-                    Center(child: CircularProgressIndicator())
+                    const Center(child: CircularProgressIndicator())
                   ] else if (_subgroups.isNotEmpty) ...[
                     for (var subgroup in _subgroups)
                       _buildDrawerItem(
@@ -268,12 +268,12 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                         },
                       ),
                   ] else ...[
-                    Center(child: Text("No subgroups available")),
+                    const Center(child: Text("No subgroups available")),
                   ],
                   if (showingSubgroups)
                     ListTile(
-                      leading: Icon(Icons.arrow_back),
-                      title: Text("Back"),
+                      leading: const Icon(Icons.arrow_back),
+                      title: const Text("Back"),
                       onTap: () {
                         setModalState(() {
                           showingSubgroups = false;
@@ -309,7 +309,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
             subgroupId: userSubgroup!,
           );
         } else {
-          return Center(child: Text('Please select a subgroup for Events'));
+          return const Center(child: Text('Please select a subgroup for Events'));
         }
       case 1:
         if (userSubgroup != null && widget.groupId.isNotEmpty) {
@@ -318,11 +318,11 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
             subgroupId: userSubgroup!,
           );
         } else {
-          return Center(
+          return const Center(
               child: Text('Please select a valid subgroup for Events'));
         }
       case 2:
-        return Center(
+        return const Center(
             child: Text('Payments Section',
                 style: TextStyle(fontSize: 16, color: Colors.grey)));
       case 3:
@@ -332,7 +332,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
             subgroupId: userSubgroup!,
           );
         } else {
-          return Center(
+          return const Center(
               child: Text('Please select a valid subgroup for Events'));
         }
       default:
@@ -344,27 +344,27 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFF8ECE0),
+        backgroundColor: const Color(0xFFF8ECE0),
         toolbarHeight: 40,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           groupName,
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         actions: [
           Row(
             children: [
-              Text('User', style: TextStyle(color: Colors.black)),
+              const Text('User', style: TextStyle(color: Colors.black)),
               Switch(
                 value: _isAdmin,
                 onChanged: (value) => setState(() => _isAdmin = value),
                 activeColor: Colors.black,
               ),
-              Text('Admin', style: TextStyle(color: Colors.black)),
+              const Text('Admin', style: TextStyle(color: Colors.black)),
             ],
           ),
         ],
@@ -373,24 +373,24 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
         children: [
           // Top section with group name, member count, and buttons
           Container(
-            color: Color(0xFFF8ECE0),
-            padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+            color: const Color(0xFFF8ECE0),
+            padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   groupName,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   "$memberCount members",
                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -398,7 +398,7 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       context.push(
                           '/home/groups/group-details/${widget.groupId}/membership');
                     }),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     _buildTopButton("Subgroups", () {
                       context.push(
                           '/home/groups/group-details/${widget.groupId}/subgroups'); // Navigate to SubgroupsPage
@@ -428,8 +428,8 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
         onPressed: () {
           _showBottomDrawer(); // Allow admins to access the drawer
         },
-        backgroundColor: Color(0xFFF8ECE0),
-        child: Icon(Icons.add),
+        backgroundColor: const Color(0xFFF8ECE0),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -440,13 +440,13 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        side: BorderSide(color: Colors.black),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+        side: const BorderSide(color: Colors.black),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Text(
         title,
-        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -458,8 +458,8 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
       style: OutlinedButton.styleFrom(
         backgroundColor:
             _selectedSection == index ? Colors.black : Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        side: BorderSide(color: Colors.black),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        side: const BorderSide(color: Colors.black),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Text(

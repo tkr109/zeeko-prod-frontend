@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
-import 'package:frontend/homepage.dart';
-import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/widgets/get_started.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -9,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
 class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
+
   @override
   _SignInScreenState createState() => _SignInScreenState();
 }
@@ -83,7 +83,7 @@ class _SignInScreenState extends State<SignInScreen> {
     if (response.statusCode == 200) {
       print('Login successful');
       _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
       setState(() {
@@ -98,8 +98,12 @@ class _SignInScreenState extends State<SignInScreen> {
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
-    otpControllers.forEach((controller) => controller.dispose());
-    otpFocusNodes.forEach((node) => node.dispose());
+    for (var controller in otpControllers) {
+      controller.dispose();
+    }
+    for (var node in otpFocusNodes) {
+      node.dispose();
+    }
     _pageController.dispose();
     super.dispose();
   }
@@ -114,20 +118,20 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8ECE0),
+      backgroundColor: const Color(0xFFF8ECE0),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
+        preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
-          backgroundColor: Color(0xFFF8ECE0),
+          backgroundColor: const Color(0xFFF8ECE0),
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black, size: 28),
+            icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
             onPressed: () {
               if (_currentStep > 0) {
                 setState(() {
                   _currentStep--;
                   _pageController.previousPage(
-                    duration: Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
                   );
                 });
@@ -136,8 +140,8 @@ class _SignInScreenState extends State<SignInScreen> {
               }
             },
           ),
-          title: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
+          title: const Padding(
+            padding: EdgeInsets.only(left: 8.0),
             child: Text(
               "User Onboarding",
               style: TextStyle(
@@ -176,7 +180,7 @@ class _SignInScreenState extends State<SignInScreen> {
           Expanded(
             child: PageView(
               controller: _pageController,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (index) {
                 setState(() {
                   _currentStep = index;
@@ -210,15 +214,15 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     content: Row(
                       children: [
-                        Icon(Icons.error_outline,
+                        const Icon(Icons.error_outline,
                             color: Colors.redAccent, size: 24),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             _currentStep == 1
                                 ? "Please enter the OTP sent to your email."
                                 : "Please complete all fields before continuing.",
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -232,7 +236,7 @@ class _SignInScreenState extends State<SignInScreen> {
               }
             },
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -246,14 +250,14 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Sign In",
+            const Text("Sign In",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             buildTextField("Email", emailController, TextInputType.emailAddress,
                 validator: validateEmail),
             buildTextField("Password", passwordController, TextInputType.text,
                 obscureText: true, validator: validateNotEmpty),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -266,12 +270,12 @@ class _SignInScreenState extends State<SignInScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Enter the OTP sent to",
+          const Text("Enter the OTP sent to",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(emailController.text,
-              style: TextStyle(fontSize: 16, color: Colors.black54)),
-          SizedBox(height: 20),
+              style: const TextStyle(fontSize: 16, color: Colors.black54)),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(4, (index) {

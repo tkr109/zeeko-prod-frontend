@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 
 class PollCard extends StatelessWidget {
   final String title;
+  final String description;
   final String postedDate;
   final VoidCallback onTap;
 
   const PollCard({
+    super.key,
     required this.title,
+    required this.description,
     required this.postedDate,
     required this.onTap,
   });
@@ -20,13 +23,13 @@ class PollCard extends StatelessWidget {
         elevation: 6,
         shadowColor: Colors.grey.withOpacity(0.3),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title and Date Row
+              // Title and Date on the same line
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -34,7 +37,7 @@ class PollCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -46,24 +49,23 @@ class PollCard extends StatelessWidget {
                   // Date
                   Text(
                     postedDate,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[400],
-                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 8),
-
-              // Indication to view details
+              const SizedBox(height: 8),
+              // Description
               Text(
-                "Tap to view details",
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
+                description,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

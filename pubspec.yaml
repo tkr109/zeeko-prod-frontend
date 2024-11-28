@@ -12,14 +12,22 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
 
+  image_picker: any
+  http: any
+  shared_preferences: any
+  permission_handler: any
+  go_router: any
+  intl: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
   http: ^0.13.4
   flutter_lints: ^4.0.0
-  shared_preferences: ^2.0.15
   go_router:
   intl:
+  image_picker:
+  path_provider:
+  permission_handler: ^10.4.0
 
 flutter:
   uses-material-design: true

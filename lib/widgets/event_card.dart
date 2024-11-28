@@ -1,35 +1,49 @@
 import 'package:flutter/material.dart';
+import 'dart:convert'; // For base64 decoding
 
 class EventCard extends StatelessWidget {
   final String id;
   final String title;
   final String date;
   final String location;
-  final String imageUrl;
+  final String? image; // Base64 string, if available
+  final String? imageUrl; // URL, if available
   final VoidCallback onTap;
 
   const EventCard({
+    super.key,
     required this.id,
     required this.title,
     required this.date,
     required this.location,
-    required this.imageUrl,
+    this.image,
+    this.imageUrl,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Debugging: Print the image URL or Base64
+    print('Image for Event: $title');
+    if (image != null) {
+      print(
+          'Base64 Image: ${image!.substring(0, 30)}...'); // Print first 30 chars for readability
+    } else {
+      print('Image URL: $imageUrl');
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Card(
         elevation: 6,
         shadowColor: Colors.black.withOpacity(0.3),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        color: Colors.black, // Black background for the card
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        color: Colors.grey[900],
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+          padding: const EdgeInsets.all(10.0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Image section
               SizedBox(
@@ -37,75 +51,82 @@ class EventCard extends StatelessWidget {
                 height: 90,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover, // Ensure the image covers the container
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[700],
-                      child: Icon(Icons.broken_image, color: Colors.white),
-                    ),
-                  ),
+                  child: image != null
+                      ? Image.memory(
+                          base64Decode(image!), // Decode base64 image
+                          fit: BoxFit.cover, // Cover the space
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildPlaceholderImage(),
+                        )
+                      : Image.network(
+                          imageUrl ?? 'https://via.placeholder.com/150',
+                          fit: BoxFit.cover, // Cover the space
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildPlaceholderImage(),
+                        ),
                 ),
               ),
-              SizedBox(width: 20), // Space between image and details
+              const SizedBox(width: 15),
               // Details section
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0), // Shift text right
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white, // White text for title
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_today,
+                            size: 16, color: Colors.grey[400]),
+                        const SizedBox(width: 5),
+                        Text(
+                          date,
+                          style:
+                              TextStyle(color: Colors.grey[400], fontSize: 14),
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(Icons.calendar_today,
-                              size: 16,
-                              color: Colors.grey[400]), // Light grey icon
-                          SizedBox(width: 5),
-                          Text(
-                            date,
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on,
+                            size: 16, color: Colors.grey[400]),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: Text(
+                            location,
                             style: TextStyle(
-                                color: Colors.grey[400], // Light grey text
-                                fontSize: 14),
+                                color: Colors.grey[400], fontSize: 14),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on,
-                              size: 16,
-                              color: Colors.grey[400]), // Light grey icon
-                          SizedBox(width: 5),
-                          Expanded(
-                            child: Text(
-                              location,
-                              style: TextStyle(
-                                  color: Colors.grey[400], // Light grey text
-                                  fontSize: 14),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      color: Colors.grey[700],
+      child: const Center(
+        child: Icon(Icons.image_not_supported, color: Colors.white, size: 40),
       ),
     );
   }

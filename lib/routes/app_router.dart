@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:frontend/groupInfo/Add/AddEventPage.dart';
 import 'package:frontend/groupInfo/Add/AddPollPage.dart';
 import 'package:frontend/groupInfo/Add/AddPostPage.dart';
@@ -21,7 +20,7 @@ class AppRouter {
       GoRoute(
         name: 'options',
         path: '/options',
-        builder: (context, state) => OptionsScreen(),
+        builder: (context, state) => const OptionsScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) => MainLayout(child: child),
@@ -29,14 +28,14 @@ class AppRouter {
           GoRoute(
             path: '/home',
             name: 'home',
-            pageBuilder: (context, state) => NoTransitionPage(
+            pageBuilder: (context, state) => const NoTransitionPage(
               child: HomePage(),
             ),
           ),
           GoRoute(
             name: 'about',
             path: '/about',
-            builder: (context, state) => AboutPage(),
+            builder: (context, state) => const AboutPage(),
           ),
           GoRoute(
             path: '/event-details/:eventId',
@@ -49,7 +48,7 @@ class AppRouter {
           GoRoute(
             path: '/home/groups',
             name: 'groups',
-            pageBuilder: (context, state) => NoTransitionPage(
+            pageBuilder: (context, state) => const NoTransitionPage(
               child: GroupsPage(),
             ),
             routes: [
@@ -108,7 +107,7 @@ class AppRouter {
           GoRoute(
             path: '/home/messages',
             name: 'messages',
-            pageBuilder: (context, state) => NoTransitionPage(
+            pageBuilder: (context, state) => const NoTransitionPage(
               child: MessagesPage(),
             ),
           ),

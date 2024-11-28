@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
 class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
+
   Future<Map<String, String>> _getUserDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
@@ -23,7 +25,7 @@ class AboutPage extends StatelessWidget {
     await prefs.remove('userId');
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text("Logged out successfully."),
         backgroundColor: Colors.green,
       ),
@@ -37,9 +39,9 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFF8ECE0),
+        backgroundColor: const Color(0xFFF8ECE0),
         elevation: 0,
-        title: Text(
+        title: const Text(
           "About",
           style: TextStyle(
             color: Colors.black,
@@ -53,8 +55,8 @@ class AboutPage extends StatelessWidget {
             onTap: () {
               GoRouter.of(context).goNamed('about');
             },
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
+            child: const Padding(
+              padding: EdgeInsets.all(12.0),
               child: CircleAvatar(
                 backgroundColor: Colors.grey,
                 radius: 18,
@@ -68,9 +70,9 @@ class AboutPage extends StatelessWidget {
         future: _getUserDetails(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Error loading user details."));
+            return const Center(child: Text("Error loading user details."));
           } else {
             final userDetails = snapshot.data!;
             return Padding(
@@ -81,7 +83,7 @@ class AboutPage extends StatelessWidget {
                     child: ListView(
                       children: userDetails.entries.map((entry) {
                         return Card(
-                          margin: EdgeInsets.symmetric(vertical: 8),
+                          margin: const EdgeInsets.symmetric(vertical: 8),
                           child: ListTile(
                             title: Text(entry.key),
                             subtitle: Text(entry.value),
@@ -90,15 +92,15 @@ class AboutPage extends StatelessWidget {
                       }).toList(),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () => _logout(context),
-                    icon: Icon(Icons.logout),
-                    label: Text("Logout"),
+                    icon: const Icon(Icons.logout),
+                    label: const Text("Logout"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),

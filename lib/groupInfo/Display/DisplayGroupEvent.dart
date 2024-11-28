@@ -10,8 +10,7 @@ class DisplayGroupEvent extends StatefulWidget {
   final String subgroupId;
 
   const DisplayGroupEvent(
-      {required this.groupId, required this.subgroupId, Key? key})
-      : super(key: key);
+      {required this.groupId, required this.subgroupId, super.key});
 
   @override
   _DisplayGroupEventState createState() => _DisplayGroupEventState();
@@ -100,14 +99,14 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SectionTitle(title: 'This Week'),
+                    const SectionTitle(title: 'This Week'),
                     ...events.map((event) => EventCard(
                           id: event['id'],
                           title: event['title'],
@@ -118,20 +117,20 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
                             // Optionally handle card tap
                           },
                         )),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Center(
                       child: ElevatedButton.icon(
                         onPressed: () {},
-                        icon: Icon(Icons.pending_actions),
-                        label: Text('Awaiting Response'),
+                        icon: const Icon(Icons.pending_actions),
+                        label: const Text('Awaiting Response'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

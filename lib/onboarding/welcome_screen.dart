@@ -3,7 +3,7 @@ import 'package:frontend/onboarding/options_screen.dart';
 import 'package:frontend/widgets/get_started.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
@@ -36,10 +36,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: Column(
           children: [
             // Zeeko Title at the top
-            Align(
+            const Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                padding: const EdgeInsets.only(top: 40.0),
+                padding: EdgeInsets.only(top: 40.0),
                 child: Text(
                   'Zeeko',
                   style: TextStyle(
@@ -50,7 +50,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Swipeable Image Section with PageController
             Expanded(
@@ -58,7 +58,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: Container(
                 child: PageView(
                   controller: _pageController,
-                  children: [
+                  children: const [
                     Placeholder(
                       fallbackHeight: 250,
                       fallbackWidth: 250,
@@ -79,7 +79,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Dots indicator for swipe pages
             Row(
@@ -95,11 +95,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 );
               }),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Subtitle and Description Text Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
                 children: [
                   Text(
@@ -123,7 +123,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
             ),
 
-            Spacer(), // Pushes content above to align the button at the bottom
+            const Spacer(), // Pushes content above to align the button at the bottom
 
             // Get Started Button
             Padding(
@@ -133,7 +133,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => OptionsScreen()),
+                    MaterialPageRoute(builder: (context) => const OptionsScreen()),
                   );
                 },
               ),

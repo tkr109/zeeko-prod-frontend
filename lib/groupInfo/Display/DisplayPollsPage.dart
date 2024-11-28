@@ -12,8 +12,8 @@ class DisplayPollsPage extends StatefulWidget {
   const DisplayPollsPage({
     required this.groupId,
     required this.subgroupId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _DisplayPollsPageState createState() => _DisplayPollsPageState();
@@ -101,22 +101,24 @@ class _DisplayPollsPageState extends State<DisplayPollsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SectionTitle(title: 'This Week'),
+                    const SectionTitle(title: 'This Week'),
                     ...polls.map((poll) => PollCard(
                           title: poll['title'] ?? "Untitled Poll",
+                          description: poll['description'] ??
+                              'Tap here to see the description',
                           postedDate: poll['date'] ?? "Unknown Date",
                           onTap: () {
                             // Optionally handle card tap
                           },
                         )),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),

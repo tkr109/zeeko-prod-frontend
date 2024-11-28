@@ -5,13 +5,13 @@ import 'package:frontend/onboarding/sign_in.dart';
 import 'package:frontend/widgets/optionBox.dart';
 
 class OptionsScreen extends StatelessWidget {
-  const OptionsScreen({Key? key}) : super(key: key);
+  const OptionsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          Color(0xFFF8ECE0), // Matches background color in the image
+          const Color(0xFFF8ECE0), // Matches background color in the image
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -19,10 +19,10 @@ class OptionsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Title
-              Align(
+              const Align(
                 alignment: Alignment.topCenter,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 40.0, bottom: 20.0),
+                  padding: EdgeInsets.only(top: 40.0, bottom: 20.0),
                   child: Text(
                     'Zeeko',
                     style: TextStyle(
@@ -33,7 +33,7 @@ class OptionsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Options
               OptionBox(
@@ -45,11 +45,11 @@ class OptionsScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => JoinAnExistingGroupScreen()),
+                        builder: (context) => const JoinAnExistingGroupScreen()),
                   );
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               OptionBox(
                 title: 'Set up a new group',
                 subtitle:
@@ -59,11 +59,11 @@ class OptionsScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => CreateGroupScreen()),
+                        builder: (context) => const CreateGroupScreen()),
                   );
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               OptionBox(
                 title: 'Sign in',
                 subtitle: 'I already have a Zeeko account',
@@ -71,11 +71,11 @@ class OptionsScreen extends StatelessWidget {
                   print('Sign in tapped');
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SignInScreen()),
+                    MaterialPageRoute(builder: (context) => const SignInScreen()),
                   );
                 },
               ),
-              Spacer(),
+              const Spacer(),
 
               // Larger Image with Padding at the Bottom
               Padding(

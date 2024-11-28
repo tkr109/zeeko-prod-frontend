@@ -7,12 +7,12 @@ class OptionBox extends StatelessWidget {
   final bool isSelected;
 
   const OptionBox({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.onTap,
     this.isSelected = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class OptionBox extends StatelessWidget {
               color: isSelected ? Colors.blue : Colors.grey.shade300,
               width: isSelected ? 2 : 1,
             ),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 10,
@@ -43,13 +43,13 @@ class OptionBox extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 subtitle,
                 style: TextStyle(

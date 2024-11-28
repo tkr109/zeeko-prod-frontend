@@ -7,6 +7,8 @@ import 'dart:convert';
 import 'package:go_router/go_router.dart';
 
 class GroupsPage extends StatefulWidget {
+  const GroupsPage({super.key});
+
   @override
   _GroupsPageState createState() => _GroupsPageState();
 }
@@ -109,9 +111,9 @@ class _GroupsPageState extends State<GroupsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xFFF8ECE0),
+        backgroundColor: const Color(0xFFF8ECE0),
         elevation: 0,
-        title: Text(
+        title: const Text(
           "Groups",
           style: TextStyle(
             color: Colors.black,
@@ -120,10 +122,10 @@ class _GroupsPageState extends State<GroupsPage> {
             letterSpacing: 0.5,
           ),
         ),
-        actions: [
+        actions: const [
           Icon(Icons.notifications, color: Colors.black),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0),
             child: CircleAvatar(
               backgroundColor: Colors.grey,
               radius: 18,
@@ -139,15 +141,15 @@ class _GroupsPageState extends State<GroupsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
-                  Text(
+                  const SizedBox(height: 20),
+                  const Text(
                     "Groups Joined",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Expanded(
                     child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2, // Two items per row
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,
@@ -175,11 +177,11 @@ class _GroupsPageState extends State<GroupsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Do you have a group code?",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
@@ -210,7 +212,7 @@ class _GroupsPageState extends State<GroupsPage> {
                               isError: true);
                         }
                       },
-                      icon: Icon(Icons.arrow_forward),
+                      icon: const Icon(Icons.arrow_forward),
                     ),
                   ],
                 ),
@@ -238,11 +240,11 @@ class _GroupsPageState extends State<GroupsPage> {
               color: isError ? Colors.redAccent : Colors.greenAccent,
               size: 24,
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -259,7 +261,7 @@ class _GroupsPageState extends State<GroupsPage> {
 class GroupCircle extends StatelessWidget {
   final String title;
 
-  GroupCircle({required this.title});
+  const GroupCircle({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -271,15 +273,15 @@ class GroupCircle extends StatelessWidget {
           backgroundColor: Colors.grey[300],
           child: Text(
             title[0],
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.black,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        SizedBox(height: 5),
-        Text(title, style: TextStyle(fontWeight: FontWeight.normal)),
+        const SizedBox(height: 5),
+        Text(title, style: const TextStyle(fontWeight: FontWeight.normal)),
       ],
     );
   }

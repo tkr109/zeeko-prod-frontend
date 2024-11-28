@@ -8,8 +8,8 @@ class AddPollPage extends StatefulWidget {
   final String groupId;
   final String subgroupId;
 
-  const AddPollPage({required this.groupId, required this.subgroupId, Key? key})
-      : super(key: key);
+  const AddPollPage(
+      {required this.groupId, required this.subgroupId, super.key});
 
   @override
   _AddPollPageState createState() => _AddPollPageState();
@@ -17,6 +17,7 @@ class AddPollPage extends StatefulWidget {
 
 class _AddPollPageState extends State<AddPollPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   List<TextEditingController> optionControllers = [
     TextEditingController(),
@@ -52,7 +53,8 @@ class _AddPollPageState extends State<AddPollPage> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'description': descriptionController.text,
+          'title': titleController.text, // Adding title to request body
+          'description': descriptionController.text, // Adding description
           'options': optionControllers
               .map((controller) => {'option': controller.text})
               .toList(),
@@ -65,8 +67,11 @@ class _AddPollPageState extends State<AddPollPage> {
 
       if (response.statusCode == 200) {
         _showCustomSnackBar('Poll created successfully!', isSuccess: true);
+        titleController.clear();
         descriptionController.clear();
-        optionControllers.forEach((controller) => controller.clear());
+        for (var controller in optionControllers) {
+          controller.clear();
+        }
       } else {
         _showCustomSnackBar('Failed to create poll', isSuccess: false);
       }
@@ -93,11 +98,11 @@ class _AddPollPageState extends State<AddPollPage> {
               color: isSuccess ? Colors.green : Colors.redAccent,
               size: 24,
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -112,19 +117,22 @@ class _AddPollPageState extends State<AddPollPage> {
 
   @override
   void dispose() {
+    titleController.dispose();
     descriptionController.dispose();
-    optionControllers.forEach((controller) => controller.dispose());
+    for (var controller in optionControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8ECE0),
+      backgroundColor: const Color(0xFFF8ECE0),
       appBar: AppBar(
-        backgroundColor: Color(0xFFF8ECE0),
+        backgroundColor: const Color(0xFFF8ECE0),
         elevation: 0,
-        title: Text(
+        title: const Text(
           "Create Poll",
           style: TextStyle(
             color: Colors.black,
@@ -137,94 +145,121 @@ class _AddPollPageState extends State<AddPollPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Description",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              TextFormField(
-                controller: descriptionController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Title",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                "Options",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Column(
-                children: List.generate(optionControllers.length, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10.0),
-                    child: TextFormField(
-                      controller: optionControllers[index],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Option cannot be empty';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: titleController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a title';
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Description",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: descriptionController,
+                  maxLines: 5,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Options",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Column(
+                  children: List.generate(optionControllers.length, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: TextFormField(
+                        controller: optionControllers[index],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Option cannot be empty';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          hintText: 'Option ${index + 1}',
                         ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        hintText: 'Option ${index + 1}',
+                      ),
+                    );
+                  }),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: addOptionField,
+                    child: const Text("Add Another Option"),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                     ),
-                  );
-                }),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: addOptionField,
-                  child: Text("Add Another Option"),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  onPressed: isSubmitting ? null : submitPoll,
-                  child: Text(
-                    isSubmitting ? "Submitting..." : "Submit Poll",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    onPressed: isSubmitting ? null : submitPoll,
+                    child: Text(
+                      isSubmitting ? "Submitting..." : "Submit Poll",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

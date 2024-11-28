@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MembershipPage extends StatefulWidget {
   final String groupId;
 
-  const MembershipPage({Key? key, required this.groupId}) : super(key: key);
+  const MembershipPage({super.key, required this.groupId});
 
   @override
   _MembershipPageState createState() => _MembershipPageState();
@@ -280,7 +280,7 @@ class _MembershipPageState extends State<MembershipPage> {
         throw Exception('Failed to remove member');
       }
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -352,7 +352,7 @@ class _MembershipPageState extends State<MembershipPage> {
 
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Admin added successfully.")),
+            const SnackBar(content: Text("Admin added successfully.")),
           );
           _fetchGroupData(); // Refresh the admins list
         } else {
@@ -379,7 +379,7 @@ class _MembershipPageState extends State<MembershipPage> {
     return Container(
       color: color,
       alignment: Alignment.centerRight,
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Icon(icon, color: Colors.white, size: 30),
     );
   }
@@ -388,21 +388,21 @@ class _MembershipPageState extends State<MembershipPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Membership'),
-        backgroundColor: Color(0xFFF8ECE0),
+        title: const Text('Membership'),
+        backgroundColor: const Color(0xFFF8ECE0),
         toolbarHeight: 40,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         elevation: 0,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 Container(
-                  color: Color(0xFFF8ECE0),
+                  color: const Color(0xFFF8ECE0),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -413,9 +413,9 @@ class _MembershipPageState extends State<MembershipPage> {
                         style: OutlinedButton.styleFrom(
                           backgroundColor:
                               _isMembersSelected ? Colors.black : Colors.white,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               vertical: 12, horizontal: 24),
-                          side: BorderSide(color: Colors.black),
+                          side: const BorderSide(color: Colors.black),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -429,16 +429,16 @@ class _MembershipPageState extends State<MembershipPage> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 60),
+                      const SizedBox(width: 60),
                       OutlinedButton(
                         onPressed: () =>
                             setState(() => _isMembersSelected = false),
                         style: OutlinedButton.styleFrom(
                           backgroundColor:
                               !_isMembersSelected ? Colors.black : Colors.white,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               vertical: 12, horizontal: 24),
-                          side: BorderSide(color: Colors.black),
+                          side: const BorderSide(color: Colors.black),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -456,8 +456,8 @@ class _MembershipPageState extends State<MembershipPage> {
                   ),
                 ),
                 if (pendingRequests.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
@@ -519,7 +519,7 @@ class _MembershipPageState extends State<MembershipPage> {
                       _isMembersSelected
                           ? 'Members List'
                           : 'Administrators List',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -537,17 +537,17 @@ class _MembershipPageState extends State<MembershipPage> {
                         // Add new admin option
                         return isAdmin
                             ? ListTile(
-                                title: Text(
+                                title: const Text(
                                   'Add New Admin',
                                   style: TextStyle(
                                     color: Colors.blue,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                leading: Icon(Icons.add, color: Colors.blue),
+                                leading: const Icon(Icons.add, color: Colors.blue),
                                 onTap: _handleAddAdmin,
                               )
-                            : SizedBox.shrink();
+                            : const SizedBox.shrink();
                       }
 
                       final user =
@@ -565,17 +565,17 @@ class _MembershipPageState extends State<MembershipPage> {
                             bool? confirm = await showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: Text('Remove Member'),
+                                title: const Text('Remove Member'),
                                 content: Text(
                                     'Are you sure you want to remove ${user['fullName']} from the group?'),
                                 actions: [
                                   TextButton(
-                                    child: Text('Cancel'),
+                                    child: const Text('Cancel'),
                                     onPressed: () =>
                                         Navigator.of(context).pop(false),
                                   ),
                                   TextButton(
-                                    child: Text('Remove'),
+                                    child: const Text('Remove'),
                                     onPressed: () =>
                                         Navigator.of(context).pop(true),
                                   ),
@@ -630,7 +630,7 @@ class MemberCard extends StatelessWidget {
   final String email;
   final String role;
 
-  const MemberCard({
+  const MemberCard({super.key, 
     required this.name,
     required this.email,
     required this.role,
@@ -645,7 +645,7 @@ class MemberCard extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
         title: Text(
           name,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -675,7 +675,7 @@ class PendingRequestCard extends StatelessWidget {
   final String date;
 
   const PendingRequestCard(
-      {required this.name, required this.email, required this.date});
+      {super.key, required this.name, required this.email, required this.date});
 
   @override
   Widget build(BuildContext context) {
@@ -684,7 +684,7 @@ class PendingRequestCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-        title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

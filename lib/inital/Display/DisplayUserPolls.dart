@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DisplayUserPolls extends StatefulWidget {
-  const DisplayUserPolls({Key? key}) : super(key: key);
+  const DisplayUserPolls({super.key});
 
   @override
   _DisplayUserPollsState createState() => _DisplayUserPollsState();
@@ -28,10 +28,10 @@ class _DisplayUserPollsState extends State<DisplayUserPolls> {
   Future<void> _getUserDataAndFetchPolls() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId = prefs.getString('userId');
-    groupIds = prefs.getStringList('groupIds') ?? []; // List of groupIds
+    groupIds = prefs.getStringList('groupIds') ?? [];
 
     if (userId != null && groupIds.isNotEmpty) {
-      fetchUserPolls();
+      await fetchUserPolls();
     } else {
       showSnackbar("User ID or group IDs not found in preferences.");
       setState(() => isLoading = false);
@@ -56,10 +56,12 @@ class _DisplayUserPollsState extends State<DisplayUserPolls> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+
         setState(() {
           polls = List<Map<String, dynamic>>.from(data['polls'].map((poll) => {
-                "id": poll['_id'] ?? '', // Ensure we include the poll ID
-                "title": poll['description'] ?? 'No Title',
+                "id": poll['_id'] ?? '',
+                "title": poll['title'] ?? '', // Handle missing title
+                "description": poll['description'] ?? 'No Description',
                 "postedDate": formatDate(poll['createdAt'] ?? ''),
               }));
           isLoading = false;
@@ -76,12 +78,16 @@ class _DisplayUserPollsState extends State<DisplayUserPolls> {
 
   Future<String> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token') ?? ''; // Retrieve the token
+    return prefs.getString('token') ?? '';
   }
 
   String formatDate(String dateStr) {
-    final DateTime date = DateTime.parse(dateStr);
-    return "${date.day} ${getMonth(date.month)} ${date.year}";
+    try {
+      final DateTime date = DateTime.parse(dateStr);
+      return "${date.day} ${getMonth(date.month)} ${date.year}";
+    } catch (e) {
+      return "Invalid Date";
+    }
   }
 
   String getMonth(int month) {
@@ -111,20 +117,30 @@ class _DisplayUserPollsState extends State<DisplayUserPolls> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
               itemCount: polls.length,
               itemBuilder: (context, index) {
-                final pollId = polls[index]['id'] ?? '';
+                final poll = polls[index];
+                final pollId = poll['id'] ?? '';
 
                 if (pollId.isEmpty) {
                   showSnackbar("Poll ID is missing.");
-                  return SizedBox.shrink(); // Skip rendering if ID is missing
+                  return const SizedBox.shrink();
                 }
 
+                // Use description as title if title is missing
+                final title = poll['title'].isNotEmpty
+                    ? poll['title']
+                    : (poll['description'] as String)
+                        .split(' ')
+                        .take(5)
+                        .join(' ');
+
                 return PollCard(
-                  title: polls[index]['title']!,
-                  postedDate: polls[index]['postedDate']!,
+                  title: title,
+                  description: poll['description'],
+                  postedDate: poll['postedDate'],
                   onTap: () {
                     Navigator.push(
                       context,

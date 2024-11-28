@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
-import 'package:frontend/homepage.dart';
 import 'package:frontend/widgets/get_started.dart';
 import 'package:frontend/widgets/optionBox.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 
 class CreateGroupScreen extends StatefulWidget {
+  const CreateGroupScreen({super.key});
+
   @override
   _CreateGroupScreenState createState() => _CreateGroupScreenState();
 }
@@ -80,8 +81,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     print("password: ${passwordController.text}");
     print("phoneNumber: ${phoneController.text}");
     print("groupName: ${groupNameController.text}");
-    print("groupActivity: ${selectedActivity}");
-    print("groupAgeGroup: ${selectedAgeGroup}");
+    print("groupActivity: $selectedActivity");
+    print("groupAgeGroup: $selectedAgeGroup");
     print("--------------------------------------");
 
     var response = await http.post(
@@ -141,8 +142,12 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     phoneController.dispose();
     emailController.dispose();
     passwordController.dispose();
-    otpControllers.forEach((controller) => controller.dispose());
-    otpFocusNodes.forEach((node) => node.dispose());
+    for (var controller in otpControllers) {
+      controller.dispose();
+    }
+    for (var node in otpFocusNodes) {
+      node.dispose();
+    }
     _pageController.dispose();
     super.dispose();
   }
@@ -173,7 +178,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     if (_currentStep == 0 && selectedActivity == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please select a group activity to continue."),
+          content: const Text("Please select a group activity to continue."),
           backgroundColor: Colors.grey.shade900,
         ),
       );
@@ -188,7 +193,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         _currentStep++;
       });
       _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
@@ -199,21 +204,21 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8ECE0),
+      backgroundColor: const Color(0xFFF8ECE0),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
+        preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
-          backgroundColor: Color(0xFFF8ECE0),
+          backgroundColor: const Color(0xFFF8ECE0),
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black, size: 28),
+            icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
             onPressed: () {
               if (_currentStep > 0) {
                 setState(() {
                   _currentStep--;
                 });
                 _pageController.previousPage(
-                  duration: Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
               } else {
@@ -221,8 +226,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               }
             },
           ),
-          title: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
+          title: const Padding(
+            padding: EdgeInsets.only(left: 8.0),
             child: Text(
               "Create Group",
               style: TextStyle(
@@ -250,7 +255,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           Expanded(
             child: PageView(
               controller: _pageController,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (index) {
                 setState(() {
                   _currentStep = index;
@@ -279,7 +284,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               }
             },
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -291,14 +296,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Choose Group Activity",
+          const Text("Choose Group Activity",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           TextField(
             controller: searchController,
             decoration: InputDecoration(
               labelText: "Search activity",
-              prefixIcon: Icon(Icons.search),
+              prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.0),
               ),
@@ -306,7 +311,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               fillColor: Colors.white,
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
             child: ListView(
               children: activityCategories.entries.map((entry) {
@@ -317,7 +322,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
                         entry.key,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.black54),
@@ -341,7 +346,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           },
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 );
               }).toList(),
@@ -358,16 +363,16 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             "Choose Age Group",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             "Age Group affects settings regarding parental control & safeguarding",
             style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           OptionBox(
             title: "Children/Youth",
             subtitle:
@@ -379,7 +384,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               });
             },
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           OptionBox(
             title: "Adults",
             subtitle: "Members 18+",
@@ -390,7 +395,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               });
             },
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           OptionBox(
             title: "Mixed",
             subtitle: "Members of all ages with or without guardians",
@@ -414,9 +419,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Group Name",
+            const Text("Group Name",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextFormField(
               controller: groupNameController,
               decoration: InputDecoration(
@@ -437,7 +442,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   Widget buildSummaryScreen() {
     return Scaffold(
       backgroundColor:
-          Color(0xFFF8ECE0), // Match background color with other pages
+          const Color(0xFFF8ECE0), // Match background color with other pages
 
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
@@ -448,7 +453,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             Text(
               groupNameController
                   .text, // Displays the group name entered in the previous step
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -456,7 +461,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               textAlign: TextAlign.center,
             ),
 
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Illustration/Image in the Center
             Image.asset(
@@ -465,10 +470,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               fit: BoxFit.contain,
             ),
 
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Completion Message
-            Text(
+            const Text(
               "Awesome!\nYou’re almost done",
               style: TextStyle(
                 fontSize: 20,
@@ -478,10 +483,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               textAlign: TextAlign.center,
             ),
 
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
 
             // Subtext below the completion message
-            Text(
+            const Text(
               "Lorem Ipsum Lorem IpsumLoremLorem IpsumLorem Lorem IpsumLorem",
               style: TextStyle(
                 fontSize: 14,
@@ -490,7 +495,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               textAlign: TextAlign.center,
             ),
 
-            Spacer(),
+            const Spacer(),
           ],
         ),
       ),
@@ -506,7 +511,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           crossAxisAlignment:
               CrossAxisAlignment.start, // Align title to the left
           children: [
-            Text(
+            const Text(
               "Set Up Your Account", // Heading for the form
               style: TextStyle(
                 fontSize: 22.0,
@@ -514,33 +519,33 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 color: Colors.black,
               ),
             ),
-            SizedBox(height: 15.0), // Add some spacing after the heading
+            const SizedBox(height: 15.0), // Add some spacing after the heading
             buildTextField(
               "First Name",
               firstNameController,
               TextInputType.name,
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             buildTextField(
               "Last Name",
               lastNameController,
               TextInputType.name,
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             buildTextField(
               "Phone Number",
               phoneController,
               TextInputType.phone,
               validator: validatePhone,
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             buildTextField(
               "Your Email",
               emailController,
               TextInputType.emailAddress,
               validator: validateEmail,
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             buildTextField(
               "Password",
               passwordController,
@@ -559,10 +564,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Enter the OTP sent to", style: TextStyle(fontSize: 18)),
+          const Text("Enter the OTP sent to", style: TextStyle(fontSize: 18)),
           Text(emailController.text,
-              style: TextStyle(fontSize: 16, color: Colors.black54)),
-          SizedBox(height: 20),
+              style: const TextStyle(fontSize: 16, color: Colors.black54)),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(4, (index) {
@@ -596,12 +601,12 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               );
             }),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           TextButton(
             onPressed: () {
               print("Request another OTP");
             },
-            child: Text("Request another OTP",
+            child: const Text("Request another OTP",
                 style: TextStyle(color: Colors.blueAccent)),
           ),
         ],

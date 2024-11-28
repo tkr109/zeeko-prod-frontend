@@ -8,8 +8,7 @@ class AddPostPage extends StatefulWidget {
   final String groupId;
   final String subgroupId;
 
-  const AddPostPage({required this.groupId, required this.subgroupId, Key? key})
-      : super(key: key);
+  const AddPostPage({required this.groupId, required this.subgroupId, super.key});
 
   @override
   _AddPostPageState createState() => _AddPostPageState();
@@ -127,11 +126,11 @@ class _AddPostPageState extends State<AddPostPage> {
               color: isSuccess ? Colors.green : Colors.redAccent,
               size: 24,
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -154,11 +153,11 @@ class _AddPostPageState extends State<AddPostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8ECE0),
+      backgroundColor: const Color(0xFFF8ECE0),
       appBar: AppBar(
-        backgroundColor: Color(0xFFF8ECE0),
+        backgroundColor: const Color(0xFFF8ECE0),
         elevation: 0,
-        title: Text(
+        title: const Text(
           "Create Post",
           style: TextStyle(
             color: Colors.black,
@@ -168,7 +167,7 @@ class _AddPostPageState extends State<AddPostPage> {
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -180,15 +179,15 @@ class _AddPostPageState extends State<AddPostPage> {
                     Text(
                       "Subgroup: $subgroupName",
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       "Title",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TextFormField(
                       controller: titleController,
                       validator: (value) {
@@ -204,16 +203,16 @@ class _AddPostPageState extends State<AddPostPage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       "Description",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TextFormField(
                       controller: descriptionController,
                       maxLines: 5,
@@ -230,10 +229,10 @@ class _AddPostPageState extends State<AddPostPage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -248,7 +247,7 @@ class _AddPostPageState extends State<AddPostPage> {
                         onPressed: isSubmitting ? null : submitPost,
                         child: Text(
                           isSubmitting ? "Submitting..." : "Submit Post",
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),

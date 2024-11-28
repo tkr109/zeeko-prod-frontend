@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SubgroupsPage extends StatefulWidget {
   final String groupId;
 
-  const SubgroupsPage({Key? key, required this.groupId}) : super(key: key);
+  const SubgroupsPage({super.key, required this.groupId});
 
   @override
   _SubgroupsPageState createState() => _SubgroupsPageState();
@@ -126,11 +126,11 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
               color: isSuccess ? Colors.green : Colors.redAccent,
               size: 24,
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -151,7 +151,7 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
 
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
@@ -160,19 +160,19 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 "Add New Subgroup",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextField(
                 controller: _subgroupNameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Subgroup Name",
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   final subgroupName = _subgroupNameController.text;
@@ -181,10 +181,10 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
                     Navigator.pop(context);
                   }
                 },
-                child: Text("Add Subgroup"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                 ),
+                child: const Text("Add Subgroup"),
               ),
             ],
           ),
@@ -197,11 +197,11 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFF8ECE0),
-        title: Text("Subgroups"),
+        backgroundColor: const Color(0xFFF8ECE0),
+        title: const Text("Subgroups"),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : _subgroups.isNotEmpty
               ? ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -214,11 +214,11 @@ class _SubgroupsPageState extends State<SubgroupsPage> {
                     );
                   },
                 )
-              : Center(child: Text("No subgroups available")),
+              : const Center(child: Text("No subgroups available")),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddSubgroupDrawer,
-        backgroundColor: Color(0xFFF8ECE0),
-        child: Icon(Icons.add, color: Colors.black),
+        backgroundColor: const Color(0xFFF8ECE0),
+        child: const Icon(Icons.add, color: Colors.black),
       ),
     );
   }
@@ -228,7 +228,7 @@ class SubgroupCard extends StatelessWidget {
   final String name;
   final int memberCount;
 
-  const SubgroupCard({required this.name, required this.memberCount});
+  const SubgroupCard({super.key, required this.name, required this.memberCount});
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +239,7 @@ class SubgroupCard extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
         title: Text(
           name,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         trailing: Text(
           '$memberCount members',

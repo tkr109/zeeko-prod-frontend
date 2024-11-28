@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
-import 'package:frontend/homepage.dart';
 import 'package:frontend/widgets/get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -8,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 
 class JoinAnExistingGroupScreen extends StatefulWidget {
+  const JoinAnExistingGroupScreen({super.key});
+
   @override
   _JoinAnExistingGroupScreenState createState() =>
       _JoinAnExistingGroupScreenState();
@@ -168,10 +169,18 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
     lastNameController.dispose();
     phoneController.dispose();
     dobController.dispose();
-    groupCodeControllers.forEach((controller) => controller.dispose());
-    otpControllers.forEach((controller) => controller.dispose());
-    groupCodeFocusNodes.forEach((node) => node.dispose());
-    otpFocusNodes.forEach((node) => node.dispose());
+    for (var controller in groupCodeControllers) {
+      controller.dispose();
+    }
+    for (var controller in otpControllers) {
+      controller.dispose();
+    }
+    for (var node in groupCodeFocusNodes) {
+      node.dispose();
+    }
+    for (var node in otpFocusNodes) {
+      node.dispose();
+    }
     _pageController.dispose();
     super.dispose();
   }
@@ -193,20 +202,20 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8ECE0),
+      backgroundColor: const Color(0xFFF8ECE0),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
+        preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
-          backgroundColor: Color(0xFFF8ECE0),
+          backgroundColor: const Color(0xFFF8ECE0),
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black, size: 28),
+            icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
             onPressed: () {
               if (_currentStep > 0) {
                 setState(() {
                   _currentStep--;
                   _pageController.previousPage(
-                    duration: Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
                   );
                 });
@@ -219,7 +228,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
             padding: const EdgeInsets.only(left: 8.0),
             child: Text(
               _currentStep == 0 ? "Join an existing group" : "User Onboarding",
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -245,7 +254,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
           Expanded(
             child: PageView(
               controller: _pageController,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (index) {
                 setState(() {
                   _currentStep = index;
@@ -296,12 +305,12 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
                   title: "Finish Up",
                   formKey: _formKeys[4],
                   fields: [
-                    Text(
+                    const Text(
                       "An OTP has been sent to your registered email address.",
                       style: TextStyle(fontSize: 16, color: Colors.black54),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     buildOTPFields(),
                   ],
                 ),
@@ -333,7 +342,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
                         false)) {
                   if (_currentStep < 4) {
                     _pageController.nextPage(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     );
                     setState(() {
@@ -353,20 +362,20 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     margin:
-                        EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                        const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                     padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+                        const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
                     content: Row(
                       children: [
-                        Icon(Icons.error_outline,
+                        const Icon(Icons.error_outline,
                             color: Colors.redAccent, size: 24),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             _currentStep == 4
                                 ? "Please enter the OTP sent to your email."
                                 : "Please complete all fields before continuing.",
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -375,13 +384,13 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
                         ),
                       ],
                     ),
-                    duration: Duration(seconds: 3),
+                    duration: const Duration(seconds: 3),
                   ),
                 );
               }
             },
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -396,7 +405,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Enter Group Code",
               style: TextStyle(
                 fontSize: 20,
@@ -404,15 +413,15 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
                 color: Colors.black,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               "Please enter the 6-digit group code provided to you to join the existing group.",
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.black54,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Group Code Input Fields with auto-focus
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -453,7 +462,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
                 );
               }),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -474,15 +483,15 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
           children: [
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ...fields,
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "All your data is kept secure and is only shared with individuals you choose.",
               style: TextStyle(fontSize: 12, color: Colors.black54),
               textAlign: TextAlign.center,

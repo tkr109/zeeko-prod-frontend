@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -76,7 +78,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _checkUserSession() async {
-    await Future.delayed(Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 300));
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
@@ -154,14 +156,14 @@ class _HomePageState extends State<HomePage> {
   Widget _getSectionContent() {
     switch (_selectedSection) {
       case 0:
-        return DisplayUserEvents();
+        return const DisplayUserEvents();
       case 1:
-        return DisplayUserPosts();
+        return const DisplayUserPosts();
       case 2:
-        return Center(
+        return const Center(
             child: Text('Payments Section', style: TextStyle(fontSize: 18)));
       case 3:
-        return DisplayUserPolls();
+        return const DisplayUserPolls();
       default:
         return Container();
     }
@@ -171,9 +173,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFF8ECE0),
+        backgroundColor: const Color(0xFFF8ECE0),
         elevation: 0,
-        title: Text(
+        title: const Text(
           "Zeeko",
           style: TextStyle(
             color: Colors.black,
@@ -187,8 +189,8 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               GoRouter.of(context).goNamed('about');
             },
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
+            child: const Padding(
+              padding: EdgeInsets.all(12.0),
               child: CircleAvatar(
                 backgroundColor: Colors.grey,
                 radius: 18,
@@ -199,7 +201,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 Padding(
@@ -226,8 +228,8 @@ class _HomePageState extends State<HomePage> {
       style: OutlinedButton.styleFrom(
         backgroundColor:
             _selectedSection == index ? Colors.black : Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        side: BorderSide(color: Colors.black),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        side: const BorderSide(color: Colors.black),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Text(

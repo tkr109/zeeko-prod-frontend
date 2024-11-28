@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
-import 'package:frontend/inital/Details/eventsDetailsPage.dart';
 import 'package:frontend/widgets/event_card.dart';
 import 'package:frontend/widgets/section_tile.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
 class DisplayUserEvents extends StatefulWidget {
-  const DisplayUserEvents({Key? key}) : super(key: key);
+  const DisplayUserEvents({super.key});
 
   @override
   _DisplayUserEventsState createState() => _DisplayUserEventsState();
@@ -74,12 +73,21 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
 
         setState(() {
           events = eventList.map<Map<String, dynamic>>((e) {
+            final bannerImage = e['bannerImage'] ?? '';
+            final isBase64Image = bannerImage.isNotEmpty &&
+                bannerImage.startsWith('/9j'); // Typical base64 JPEG header
+
             return {
-              "id": e['_id'] ?? '', // Safeguard against null
+              "id": e['_id'] ?? '',
               "title": e['title'] ?? 'No Title',
               "date": formatDate(e['timings'] ?? ''),
               "location": e['location'] ?? 'No Location',
-              "imageUrl": e['bannerImage'] ?? 'https://via.placeholder.com/150',
+              "image": isBase64Image ? bannerImage : null, // Save base64 string
+              "imageUrl": isBase64Image
+                  ? null
+                  : bannerImage.isNotEmpty
+                      ? bannerImage
+                      : 'https://via.placeholder.com/150', // Default URL
               "description": e['description'] ?? 'No Description',
               "responses": e['responses'] ?? {},
               "isAcceptingResponses": e['isAcceptingResponses'] ?? false,
@@ -144,9 +152,9 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : events.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text(
                     "No events found.",
                     style: TextStyle(fontSize: 18, color: Colors.grey),
@@ -158,7 +166,7 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SectionTitle(title: 'This week'),
+                        const SectionTitle(title: 'This week'),
                         ...events.map((event) {
                           final eventId = event['id'] ?? '';
                           return EventCard(
@@ -166,7 +174,9 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
                             title: event['title'],
                             date: event['date'],
                             location: event['location'],
-                            imageUrl: event['imageUrl'],
+                            image: event['image'], // Pass the base64 string
+                            imageUrl:
+                                event['imageUrl'], // Pass the URL if available
                             onTap: () {
                               if (eventId.isNotEmpty) {
                                 context.goNamed(
@@ -181,7 +191,7 @@ class _DisplayUserEventsState extends State<DisplayUserEvents> {
                               }
                             },
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),

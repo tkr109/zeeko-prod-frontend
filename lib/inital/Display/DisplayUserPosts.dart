@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class DisplayUserPosts extends StatefulWidget {
+  const DisplayUserPosts({super.key});
+
   @override
   _DisplayUserPostsState createState() => _DisplayUserPostsState();
 }
@@ -123,7 +125,7 @@ class _DisplayUserPostsState extends State<DisplayUserPosts> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
               padding: const EdgeInsets.all(16.0),
               itemCount: posts.length,

@@ -5,11 +5,13 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
 class EventDetailsPage extends StatefulWidget {
   final String eventId;
 
-  const EventDetailsPage({Key? key, required this.eventId}) : super(key: key);
+  const EventDetailsPage({super.key, required this.eventId});
 
   @override
   _EventDetailsPageState createState() => _EventDetailsPageState();
@@ -212,17 +214,53 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Widget _buildEventBanner() {
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        image: DecorationImage(
-          image: NetworkImage(eventDetails?['bannerImage'] ??
-              'https://via.placeholder.com/150'),
-          fit: BoxFit.cover,
+    // Check if `bannerImage` exists and is not empty
+    final String? base64Image = eventDetails?['bannerImage'];
+    if (base64Image == null || base64Image.isEmpty) {
+      return Container(
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.grey.shade300, // Placeholder background color
         ),
-      ),
-    );
+        child: const Center(
+          child: Text(
+            'No Image Available',
+            style: TextStyle(color: Colors.black54, fontSize: 16),
+          ),
+        ),
+      );
+    }
+
+    try {
+      // Decode the base64 string
+      Uint8List decodedBytes = base64Decode(base64Image);
+
+      return Container(
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          image: DecorationImage(
+            image: MemoryImage(decodedBytes), // Use MemoryImage for base64 data
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    } catch (e) {
+      return Container(
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.grey.shade300, // Placeholder background color
+        ),
+        child: const Center(
+          child: Text(
+            'Error Loading Image',
+            style: TextStyle(color: Colors.black54, fontSize: 16),
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildEventInfo() {
@@ -327,8 +365,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   Widget _buildComment(Map<String, dynamic> comment) {
     return ListTile(
       leading: CircleAvatar(
-        child: Icon(Icons.person),
         backgroundColor: Colors.grey.shade300,
+        child: const Icon(Icons.person),
       ),
       title: Text(
         comment['userId']?.toString() ?? 'Anonymous',

@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PostDetailsPage extends StatefulWidget {
   final String postId;
 
-  const PostDetailsPage({Key? key, required this.postId}) : super(key: key);
+  const PostDetailsPage({super.key, required this.postId});
 
   @override
   _PostDetailsPageState createState() => _PostDetailsPageState();
@@ -51,7 +51,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
           isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
               content: Text("Failed to load post details"),
               backgroundColor: Colors.red),
         );
@@ -74,7 +74,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
 
     if (userId == null || token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
             content: Text("User not logged in"), backgroundColor: Colors.red),
       );
       return;
@@ -108,13 +108,13 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
               content: Text("Comment added successfully"),
               backgroundColor: Colors.green),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
               content: Text("Failed to add comment"),
               backgroundColor: Colors.red),
         );
@@ -144,7 +144,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -153,7 +153,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
         elevation: 0,
         title: Text(
           postDetails?['title'] ?? 'No Title',
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 Expanded(
@@ -173,35 +173,35 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                         // Post Heading
                         Text(
                           postDetails?['title'] ?? 'No Title',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
 
                         // Date Information
                         Text(
                           formatDate(postDetails?['date']),
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
+                          style: const TextStyle(color: Colors.grey, fontSize: 14),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
                         // Post Description
                         Text(
                           postDetails?['description'] ?? 'No Description',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.blueGrey,
                             fontSize: 14,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
                         Divider(color: Colors.grey[400], thickness: 2),
 
                         // Comments Section
-                        Text(
+                        const Text(
                           'Comments:',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -211,7 +211,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                         ),
                         ListView.builder(
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: comments.length,
                           itemBuilder: (context, index) {
                             return _buildComment(comments[index]);
@@ -240,16 +240,16 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           leading: CircleAvatar(
             radius: 15,
             backgroundColor: Colors.grey.shade300,
-            child: Icon(Icons.person, color: Colors.white),
+            child: const Icon(Icons.person, color: Colors.white),
           ),
-          title: Text(userName, style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Text(commentText),
         ),
-        Divider(),
+        const Divider(),
       ],
     );
   }
@@ -257,7 +257,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
   // Method to build "Write a comment" input field
   Widget _buildWriteCommentField() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.grey[200],
         border: Border(top: BorderSide(color: Colors.grey[300]!)),
@@ -267,7 +267,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
           Expanded(
             child: TextField(
               controller: _commentController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Write a comment...',
                 filled: true,

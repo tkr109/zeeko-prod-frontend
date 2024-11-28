@@ -12,8 +12,8 @@ class DisplayGroupPosts extends StatefulWidget {
   const DisplayGroupPosts({
     required this.groupId,
     required this.subgroupId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _DisplayGroupPostsState createState() => _DisplayGroupPostsState();
@@ -95,7 +95,7 @@ class _DisplayGroupPostsState extends State<DisplayGroupPosts> {
     List<Widget> sections = [];
 
     if (thisWeekPosts.isNotEmpty) {
-      sections.add(SectionTitle(title: 'This Week'));
+      sections.add(const SectionTitle(title: 'This Week'));
       sections.addAll(
         thisWeekPosts.map((post) => PostCard(
               title: post['title'],
@@ -132,7 +132,7 @@ class _DisplayGroupPostsState extends State<DisplayGroupPosts> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
