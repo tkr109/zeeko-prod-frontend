@@ -4,6 +4,7 @@ import 'package:frontend/widgets/section_tile.dart';
 import 'package:frontend/widgets/poll_card.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:frontend/inital/Details/pollsDetailsPage.dart'; // Import your PollDetailsPage
 
 class DisplayPollsPage extends StatefulWidget {
   final String groupId;
@@ -42,8 +43,10 @@ class _DisplayPollsPageState extends State<DisplayPollsPage> {
           if (pollList != null) {
             polls = pollList.map((p) {
               return {
-                "title": p['description']?.toString() ?? "Untitled Poll",
-                "date": formatDate(p['date']?.toString() ?? ""),
+                "id": p['_id'] ?? '', // Ensure ID is passed
+                "title": p['title']?.toString() ?? "Untitled Poll",
+                "description": p['description']?.toString() ?? "No Description",
+                "postedDate": formatDate(p['date']?.toString() ?? ""),
               };
             }).toList();
           } else {
@@ -102,26 +105,31 @@ class _DisplayPollsPageState extends State<DisplayPollsPage> {
     return Scaffold(
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SectionTitle(title: 'This Week'),
-                    ...polls.map((poll) => PollCard(
-                          title: poll['title'] ?? "Untitled Poll",
-                          description: poll['description'] ??
-                              'Tap here to see the description',
-                          postedDate: poll['date'] ?? "Unknown Date",
-                          onTap: () {
-                            // Optionally handle card tap
-                          },
-                        )),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
+          : ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: polls.length,
+              itemBuilder: (context, index) {
+                final poll = polls[index];
+                final pollId = poll['id'] ?? '';
+
+                if (pollId.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return PollCard(
+                  title: poll['title'],
+                  description: poll['description'],
+                  postedDate: poll['postedDate'],
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PollDetailsPage(pollId: pollId),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
     );
   }

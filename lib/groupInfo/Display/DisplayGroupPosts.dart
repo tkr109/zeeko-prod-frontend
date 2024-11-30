@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/constants.dart';
+import 'package:frontend/inital/Details/postDetailPage.dart';
 import 'package:frontend/widgets/post_card.dart';
-import 'package:frontend/widgets/section_tile.dart'; // Import SectionTile if you use it here
+import 'package:frontend/widgets/section_tile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -40,6 +41,7 @@ class _DisplayGroupPostsState extends State<DisplayGroupPosts> {
         setState(() {
           posts = postList
               .map((post) => {
+                    "id": post['_id'], // Ensure `id` is passed for details page
                     "title": post['title'],
                     "description": post['description'],
                     "date": DateTime.parse(post['date']),
@@ -97,10 +99,21 @@ class _DisplayGroupPostsState extends State<DisplayGroupPosts> {
     if (thisWeekPosts.isNotEmpty) {
       sections.add(const SectionTitle(title: 'This Week'));
       sections.addAll(
-        thisWeekPosts.map((post) => PostCard(
-              title: post['title'],
-              date: formatDate(post['date']),
-              description: post['description'],
+        thisWeekPosts.map((post) => GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PostDetailsPage(postId: post['id']), // Pass post ID
+                  ),
+                );
+              },
+              child: PostCard(
+                title: post['title'],
+                date: formatDate(post['date']),
+                description: post['description'],
+              ),
             )),
       );
     }
@@ -117,10 +130,21 @@ class _DisplayGroupPostsState extends State<DisplayGroupPosts> {
     for (var entry in groupedPosts.entries) {
       sections.add(SectionTitle(title: entry.key));
       sections.addAll(
-        entry.value.map((post) => PostCard(
-              title: post['title'],
-              date: formatDate(post['date']),
-              description: post['description'],
+        entry.value.map((post) => GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PostDetailsPage(postId: post['id']), // Pass post ID
+                  ),
+                );
+              },
+              child: PostCard(
+                title: post['title'],
+                date: formatDate(post['date']),
+                description: post['description'],
+              ),
             )),
       );
     }

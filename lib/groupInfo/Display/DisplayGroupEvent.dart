@@ -4,6 +4,7 @@ import 'package:frontend/widgets/section_tile.dart';
 import '../../widgets/event_card.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:go_router/go_router.dart';
 
 class DisplayGroupEvent extends StatefulWidget {
   final String groupId;
@@ -33,24 +34,32 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
 
       if (response.statusCode == 200) {
         final List<dynamic> eventList = json.decode(response.body)['events'];
-        print(response.body);
+
         setState(() {
-          events = eventList
-              .map((e) => {
-                    "id": e['_id'],
-                    "title": e['title'],
-                    "date": formatDate(e['timings']),
-                    "location": e['location'],
-                    "imageUrl":
-                        e['bannerImage'] ?? 'https://via.placeholder.com/150',
-                    "responses": e['responses'],
-                    "duration": e['duration'],
-                    "description": e['description'],
-                    "isAcceptingResponses": e['isAcceptingResponses'],
-                    "isVisible": e['isVisible'],
-                    "comments": e['comments'] ?? []
-                  })
-              .toList();
+          events = eventList.map((e) {
+            final bannerImage = e['bannerImage'] ?? '';
+            final isBase64Image = bannerImage.isNotEmpty &&
+                bannerImage.startsWith('/9j'); // Check for base64 format
+
+            return {
+              "id": e['_id'],
+              "title": e['title'],
+              "date": formatDate(e['timings']),
+              "location": e['location'],
+              "image": isBase64Image ? bannerImage : null, // Save base64 string
+              "imageUrl": isBase64Image
+                  ? null
+                  : bannerImage.isNotEmpty
+                      ? bannerImage
+                      : 'https://via.placeholder.com/150', // Default URL
+              "responses": e['responses'],
+              "duration": e['duration'],
+              "description": e['description'],
+              "isAcceptingResponses": e['isAcceptingResponses'],
+              "isVisible": e['isVisible'],
+              "comments": e['comments'] ?? []
+            };
+          }).toList();
           isLoading = false;
         });
       } else {
@@ -112,9 +121,13 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
                           title: event['title'],
                           date: event['date'],
                           location: event['location'],
-                          imageUrl: event['imageUrl'],
+                          image: event['image'], // Pass base64 string
+                          imageUrl: event['imageUrl'], // Pass URL
                           onTap: () {
-                            // Optionally handle card tap
+                            context.goNamed(
+                              'eventDetails', // Replace with the route name for `DisplayUserEvents`
+                              pathParameters: {'eventId': event['id']},
+                            );
                           },
                         )),
                     const SizedBox(height: 20),
