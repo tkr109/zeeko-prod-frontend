@@ -73,6 +73,7 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
         final data = jsonDecode(response.body);
         token = data['token']; // Extract JWT token from response
         print('OTP verified successfully. Token: $token');
+        print(emailController.text);
         saveUserState(data['token'], emailController.text);
         context.go('/home');
         // Handle successful verification (e.g., navigate to a new screen, store the token)
@@ -361,10 +362,10 @@ class _JoinAnExistingGroupScreenState extends State<JoinAnExistingGroupScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16.0, horizontal: 20.0),
                     content: Row(
                       children: [
                         const Icon(Icons.error_outline,

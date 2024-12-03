@@ -202,8 +202,8 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                       showingSubgroups
                           ? "Select Subgroup for $selectedCategory"
                           : "Choose an Option",
-                      style:
-                          const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -268,7 +268,25 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
                         },
                       ),
                   ] else ...[
-                    const Center(child: Text("No subgroups available")),
+                    const Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            "No subgroups available",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8), // Add spacing between the texts
+                          Text(
+                            "Please create a subgroup from the subgroups tab.",
+                            style: TextStyle(fontSize: 14),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                   if (showingSubgroups)
                     ListTile(
@@ -309,7 +327,8 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
             subgroupId: userSubgroup!,
           );
         } else {
-          return const Center(child: Text('Please select a subgroup for Events'));
+          return const Center(
+              child: Text('Please select a subgroup for Events'));
         }
       case 1:
         if (userSubgroup != null && widget.groupId.isNotEmpty) {
@@ -355,19 +374,19 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
           style: const TextStyle(
               color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        actions: [
-          Row(
-            children: [
-              const Text('User', style: TextStyle(color: Colors.black)),
-              Switch(
-                value: _isAdmin,
-                onChanged: (value) => setState(() => _isAdmin = value),
-                activeColor: Colors.black,
-              ),
-              const Text('Admin', style: TextStyle(color: Colors.black)),
-            ],
-          ),
-        ],
+        // actions: [
+        //   Row(
+        //     children: [
+        //       const Text('User', style: TextStyle(color: Colors.black)),
+        //       Switch(
+        //         value: _isAdmin,
+        //         onChanged: (value) => setState(() => _isAdmin = value),
+        //         activeColor: Colors.black,
+        //       ),
+        //       const Text('Admin', style: TextStyle(color: Colors.black)),
+        //     ],
+        //   ),
+        // ],
       ),
       body: Column(
         children: [
@@ -446,7 +465,8 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
       ),
       child: Text(
         title,
-        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        style:
+            const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
       ),
     );
   }

@@ -65,6 +65,33 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
+  Future<void> _deleteEvent() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    print(widget.eventId);
+    try {
+      final url = Uri.parse(
+          '${Constants.serverUrl}/api/event/delete/${widget.eventId}');
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        _showSnackbar("Event deleted successfully!");
+        context.goNamed('home'); // Redirect to the home page
+      } else {
+        _showSnackbar("Failed to delete event", isError: true);
+      }
+    } catch (error) {
+      _showSnackbar("Error deleting event: $error", isError: true);
+    }
+  }
+
   Future<void> _submitResponse(String userResponse) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -157,6 +184,35 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
+  Future<void> _confirmDeleteEvent() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Event'),
+          content: const Text('Are you sure you want to delete this event?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await _deleteEvent();
+    }
+  }
+
   String _formatDate(String? isoDate) {
     if (isoDate == null) return 'N/A';
     final DateTime dateTime = DateTime.parse(isoDate);
@@ -175,6 +231,25 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => context.goNamed('home'),
         ),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: Colors.black),
+            onSelected: (value) {
+              if (value == 'delete') {
+                _confirmDeleteEvent();
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'delete',
+                child: Text(
+                  'Delete Event',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

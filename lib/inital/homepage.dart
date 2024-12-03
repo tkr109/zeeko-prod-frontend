@@ -28,7 +28,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _fetchAndStoreUserDetails();
-    _checkUserSession();
   }
 
   Future<void> _fetchAndStoreUserDetails() async {
@@ -69,6 +68,7 @@ class _HomePageState extends State<HomePage> {
         print(fullName);
 
         setState(() {});
+        _checkUserSession();
       } else {
         print('Failed to fetch user details: ${response.body}');
       }

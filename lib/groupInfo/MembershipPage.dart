@@ -164,26 +164,34 @@ class _MembershipPageState extends State<MembershipPage> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
+            final bool hasSubgroups = subgroups.isNotEmpty;
             return AlertDialog(
               title: const Text("Select Subgroups"),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: subgroups.map((subgroup) {
-                    return CheckboxListTile(
-                      title: Text(subgroup['name']),
-                      value: selectedSubgroupIds.contains(subgroup['id']),
-                      onChanged: (bool? value) {
-                        setState(() {
-                          if (value == true) {
-                            selectedSubgroupIds.add(subgroup['id']);
-                          } else {
-                            selectedSubgroupIds.remove(subgroup['id']);
-                          }
-                        });
-                      },
-                    );
-                  }).toList(),
+                  children: hasSubgroups
+                      ? subgroups.map((subgroup) {
+                          return CheckboxListTile(
+                            title: Text(subgroup['name']),
+                            value: selectedSubgroupIds.contains(subgroup['id']),
+                            onChanged: (bool? value) {
+                              setState(() {
+                                if (value == true) {
+                                  selectedSubgroupIds.add(subgroup['id']);
+                                } else {
+                                  selectedSubgroupIds.remove(subgroup['id']);
+                                }
+                              });
+                            },
+                          );
+                        }).toList()
+                      : [
+                          const Text(
+                            "Please create a subgroup from the subgroups tab.",
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                 ),
               ),
               actions: [
@@ -193,8 +201,9 @@ class _MembershipPageState extends State<MembershipPage> {
                 ),
                 TextButton(
                   child: const Text("Confirm"),
-                  onPressed: () =>
-                      Navigator.of(context).pop(selectedSubgroupIds),
+                  onPressed: hasSubgroups && selectedSubgroupIds.isNotEmpty
+                      ? () => Navigator.of(context).pop(selectedSubgroupIds)
+                      : null, // Disable the button if no subgroups or nothing selected
                 ),
               ],
             );
@@ -457,8 +466,8 @@ class _MembershipPageState extends State<MembershipPage> {
                 ),
                 if (pendingRequests.isNotEmpty)
                   const Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -544,7 +553,8 @@ class _MembershipPageState extends State<MembershipPage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                leading: const Icon(Icons.add, color: Colors.blue),
+                                leading:
+                                    const Icon(Icons.add, color: Colors.blue),
                                 onTap: _handleAddAdmin,
                               )
                             : const SizedBox.shrink();
@@ -630,7 +640,8 @@ class MemberCard extends StatelessWidget {
   final String email;
   final String role;
 
-  const MemberCard({super.key, 
+  const MemberCard({
+    super.key,
     required this.name,
     required this.email,
     required this.role,

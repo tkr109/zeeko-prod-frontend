@@ -122,13 +122,18 @@ class _GroupsPageState extends State<GroupsPage> {
             letterSpacing: 0.5,
           ),
         ),
-        actions: const [
-          Icon(Icons.notifications, color: Colors.black),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.grey,
-              radius: 18,
+        actions: [
+          GestureDetector(
+            onTap: () {
+              GoRouter.of(context).goNamed('about');
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(12.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.grey,
+                radius: 18,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
             ),
           ),
         ],
@@ -149,7 +154,8 @@ class _GroupsPageState extends State<GroupsPage> {
                   const SizedBox(height: 10),
                   Expanded(
                     child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2, // Two items per row
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,
