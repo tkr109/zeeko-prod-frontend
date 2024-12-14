@@ -11,23 +11,18 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-
   image_picker: any
-  http: any
+  http: ^0.13.4
   shared_preferences: any
-  permission_handler: any
+  permission_handler: ^10.4.0
   go_router: any
   intl: any
+  path_provider: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  http: ^0.13.4
   flutter_lints: ^4.0.0
-  go_router:
-  intl:
-  image_picker:
-  path_provider:
-  permission_handler: ^10.4.0
 
 
 flutter:

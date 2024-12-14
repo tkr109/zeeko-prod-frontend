@@ -20,6 +20,7 @@ class GroupDetailsPage extends StatefulWidget {
 class _GroupDetailsPageState extends State<GroupDetailsPage> {
   String groupName = "Loading...";
   int memberCount = 0;
+  int groupcode = 0;
   bool isLoading = true;
   int _selectedSection = 0; // 0 = Events, 1 = Posts, 2 = Payments, 3 = Polls
   bool _isAdmin = false;
@@ -52,23 +53,54 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
         },
       );
 
+      print("------groupdetails--------");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        setState(() {
-          groupName = data['groupName'] ?? 'Unnamed Group';
-          memberCount = data['memberCount'] ?? 0;
-          isLoading = false;
-        });
+
+        // Debugging the decoded data structure
+        print("Decoded Data: $data");
+
+        if (data != null && data is Map<String, dynamic>) {
+          setState(() {
+            groupName = data['groupName'] ?? 'Unnamed Group';
+            memberCount = data['memberCount'] ?? 0;
+
+            // Check if groupcode is a string and convert to int
+            var code = data['code'];
+            if (code is String) {
+              groupcode =
+                  int.tryParse(code) ?? 0; // If it's a string, parse it to int
+            } else {
+              groupcode = code ?? 0; // Use code directly if it's already an int
+            }
+
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            groupName = 'Invalid response format';
+            isLoading = false;
+            groupcode = 0;
+          });
+        }
       } else {
+        // Handle HTTP errors
         setState(() {
           groupName = 'Error loading group';
           isLoading = false;
+          groupcode = 0;
         });
       }
     } catch (e) {
+      // Handle exceptions
+      print("Exception: $e");
       setState(() {
         groupName = 'Error loading group';
         isLoading = false;
+        groupcode = 0;
       });
     }
   }
@@ -319,12 +351,23 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
 
   // Method to get the content for each section
   Widget _getSectionContent() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     switch (_selectedSection) {
       case 0:
         if (userSubgroup != null) {
           return DisplayGroupEvent(
             groupId: widget.groupId,
             subgroupId: userSubgroup!,
+            isAdmin: _isAdmin,
+          );
+        } else if (userSubgroup == null && _isAdmin) {
+          print("Navigating to DisplayGroupEvent with isAdmin: $_isAdmin");
+          return DisplayGroupEvent(
+            groupId: widget.groupId,
+            subgroupId: "universal",
+            isAdmin: _isAdmin,
           );
         } else {
           return const Center(
@@ -333,9 +376,14 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
       case 1:
         if (userSubgroup != null && widget.groupId.isNotEmpty) {
           return DisplayGroupPosts(
-            groupId: widget.groupId,
-            subgroupId: userSubgroup!,
-          );
+              groupId: widget.groupId,
+              subgroupId: userSubgroup!,
+              isAdmin: _isAdmin);
+        } else if (userSubgroup == null && _isAdmin) {
+          return DisplayGroupPosts(
+              groupId: widget.groupId,
+              subgroupId: "universal",
+              isAdmin: _isAdmin);
         } else {
           return const Center(
               child: Text('Please select a valid subgroup for Events'));
@@ -347,9 +395,14 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
       case 3:
         if (userSubgroup != null && widget.groupId.isNotEmpty) {
           return DisplayPollsPage(
-            groupId: widget.groupId,
-            subgroupId: userSubgroup!,
-          );
+              groupId: widget.groupId,
+              subgroupId: userSubgroup!,
+              isAdmin: _isAdmin);
+        } else if (userSubgroup == null && _isAdmin) {
+          return DisplayPollsPage(
+              groupId: widget.groupId,
+              subgroupId: "universal",
+              isAdmin: _isAdmin);
         } else {
           return const Center(
               child: Text('Please select a valid subgroup for Events'));
@@ -397,12 +450,30 @@ class _GroupDetailsPageState extends State<GroupDetailsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  groupName,
-                  style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
+                Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.center, // Align content to the center
+                  children: [
+                    Text(
+                      groupName,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    // Add spacing between the name and code
+                    if (_isAdmin) // Display the code only if the user is an admin
+                      Text(
+                        '#$groupcode', // Display the code with a '#' prefix
+                        style: const TextStyle(
+                          fontSize:
+                              13, // Adjusted font size for better visibility
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey,
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(

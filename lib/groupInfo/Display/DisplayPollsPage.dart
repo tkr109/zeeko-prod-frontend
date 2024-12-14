@@ -5,14 +5,16 @@ import 'package:frontend/widgets/poll_card.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:frontend/inital/Details/pollsDetailsPage.dart'; // Import your PollDetailsPage
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DisplayPollsPage extends StatefulWidget {
   final String groupId;
   final String subgroupId;
-
+  final bool isAdmin;
   const DisplayPollsPage({
     required this.groupId,
     required this.subgroupId,
+    required this.isAdmin,
     super.key,
   });
 
@@ -32,13 +34,24 @@ class _DisplayPollsPageState extends State<DisplayPollsPage> {
 
   Future<void> fetchPolls() async {
     try {
-      final response = await http.get(Uri.parse(
-          '${Constants.serverUrl}/api/group/polls/${widget.groupId}/${widget.subgroupId}'));
+      var response;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
 
+      if (widget.isAdmin && widget.subgroupId == "universal") {
+        response = await http.get(Uri.parse(
+            '${Constants.serverUrl}/api/group/admin/polls/${widget.groupId}/${userId}'));
+      } else {
+        response = await http.get(Uri.parse(
+            '${Constants.serverUrl}/api/group/polls/${widget.groupId}/${widget.subgroupId}'));
+      }
+      print("poll reponse code");
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic>? pollList = data['polls'];
-
+        print("--polls--");
+        print(data['polls']);
         setState(() {
           if (pollList != null) {
             polls = pollList.map((p) {

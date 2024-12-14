@@ -48,8 +48,12 @@ class _MembershipPageState extends State<MembershipPage> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         print(data);
+        final adminIds =
+            List<String>.from(data['admins'].map((admin) => admin['_id']));
         setState(() {
-          members = List<Map<String, dynamic>>.from(data['members']);
+          members = List<Map<String, dynamic>>.from(data['members'])
+              .where((member) => !adminIds.contains(member['_id']))
+              .toList();
           admins = List<Map<String, dynamic>>.from(data['admins']);
           pendingRequests =
               List<Map<String, dynamic>>.from(data['pendingRequests']);

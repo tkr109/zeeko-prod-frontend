@@ -5,14 +5,17 @@ import 'package:frontend/widgets/post_card.dart';
 import 'package:frontend/widgets/section_tile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DisplayGroupPosts extends StatefulWidget {
   final String groupId;
   final String subgroupId;
+  final bool isAdmin;
 
   const DisplayGroupPosts({
     required this.groupId,
     required this.subgroupId,
+    required this.isAdmin,
     super.key,
   });
 
@@ -32,9 +35,18 @@ class _DisplayGroupPostsState extends State<DisplayGroupPosts> {
 
   Future<void> fetchPosts() async {
     try {
-      final response = await http.get(Uri.parse(
-          '${Constants.serverUrl}/api/group/posts/${widget.groupId}/${widget.subgroupId}'));
+      var response;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
 
+      if (widget.isAdmin && widget.subgroupId == "universal") {
+        response = await http.get(Uri.parse(
+            '${Constants.serverUrl}/api/group/admin/posts/${widget.groupId}/${userId}'));
+      } else {
+        response = await http.get(Uri.parse(
+            '${Constants.serverUrl}/api/group/posts/${widget.groupId}/${widget.subgroupId}'));
+      }
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> postList = json.decode(response.body)['posts'];
 

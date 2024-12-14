@@ -5,13 +5,18 @@ import '../../widgets/event_card.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DisplayGroupEvent extends StatefulWidget {
   final String groupId;
   final String subgroupId;
+  final bool isAdmin;
 
   const DisplayGroupEvent(
-      {required this.groupId, required this.subgroupId, super.key});
+      {required this.groupId,
+      required this.subgroupId,
+      required this.isAdmin,
+      super.key});
 
   @override
   _DisplayGroupEventState createState() => _DisplayGroupEventState();
@@ -24,14 +29,27 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
   @override
   void initState() {
     super.initState();
+    print("isAdmin value in initState: ${widget.isAdmin}");
     fetchEvents();
   }
 
   Future<void> fetchEvents() async {
     try {
-      final response = await http.get(Uri.parse(
-          '${Constants.serverUrl}/api/group/events/${widget.groupId}/${widget.subgroupId}'));
+      print("--group events--");
+      print("Fetching events for isAdmin: ${widget.isAdmin}");
 
+      var response;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
+      print(widget.subgroupId);
+      if (widget.isAdmin && widget.subgroupId == "universal") {
+        response = await http.get(Uri.parse(
+            '${Constants.serverUrl}/api/group/admin/events/${widget.groupId}/${userId}'));
+      } else {
+        response = await http.get(Uri.parse(
+            '${Constants.serverUrl}/api/group/events/${widget.groupId}/${widget.subgroupId}'));
+      }
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> eventList = json.decode(response.body)['events'];
 
@@ -131,25 +149,25 @@ class _DisplayGroupEventState extends State<DisplayGroupEvent> {
                           },
                         )),
                     const SizedBox(height: 20),
-                    Center(
-                      child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.pending_actions),
-                        label: const Text('Awaiting Response'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+                    // Center(
+                    //   child: ElevatedButton.icon(
+                    //     onPressed: () {},
+                    //     icon: const Icon(Icons.pending_actions),
+                    //     label: const Text('Awaiting Response'),
+                    //     style: ElevatedButton.styleFrom(
+                    //       backgroundColor: Colors.red,
+                    //       padding: const EdgeInsets.symmetric(
+                    //           horizontal: 20, vertical: 12),
+                    //       shape: RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(20),
+                    //       ),
+                    //       textStyle: const TextStyle(
+                    //         fontSize: 16,
+                    //         fontWeight: FontWeight.bold,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
